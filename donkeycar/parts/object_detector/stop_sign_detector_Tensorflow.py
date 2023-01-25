@@ -44,28 +44,32 @@ class StopSignDetector(object):
         self.reverse_throttle = reverse_throttle
         self.is_reversing = False
 
-    def download_labels(self,filename):
-        base_url = 'https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/data/'
-        label_dir = tf.keras.utils.get_file(fname=filename,
-                                            origin=base_url + filename,
-                                            untar=False)
-        label_dir = pathlib.Path(label_dir)
-        return str(label_dir)
-
-    def download_file(self, url, filename):
-        if not os.path.isfile(filename):
-            urllib.request.urlretrieve(url, filename)
-            
     # Download and extract model
-    def download_model(self,model_name):
+    def download_model(model_name):
+        if os.path.isdir("Tensorflow/models/{}".format(model_name)):
+            print("Found model!")
+            return "Tensorflow/models/{}".format(model_name)
         base_url = 'http://download.tensorflow.org/models/object_detection/'
         model_file = model_name + '.tar.gz'
         model_dir = tf.keras.utils.get_file(fname=model_name,
                                             origin=base_url + model_file,
-                                            untar=True)
+                                            untar=True, cache_subdir="Tensorflow/models/{}".format(model_name))
         return str(model_dir)
 
-    
+
+    # Download labels file
+    def download_labels(filename):
+        if os.path.isdir("Tensorflow/Labels/{}".format(filename)):
+            print("Found model!")
+            return "Tensorflow/Labels/{}".format(filename)
+        base_url = 'https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/data/'
+        label_dir = tf.keras.utils.get_file(fname=filename,
+                                            origin=base_url + filename,
+                                            untar=False, cache_subdir="Tensorflow/Labels/{}".format(filename))
+        label_dir = pathlib.Path(label_dir)
+        return str(label_dir)
+            
+            
     def load_image_into_numpy_array(self,img):
         """Load an image from file into a numpy array.
 
