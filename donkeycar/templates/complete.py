@@ -371,10 +371,16 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None,
 
         elif model_type == "imu":
             assert cfg.HAVE_IMU, 'Missing imu parameter in config'
-            # Run the pilot if the mode is not user.
-            inputs = ['cam/image_array',
-                    'imu/acl_x', 'imu/acl_y', 'imu/acl_z',
-                    'imu/gyr_x', 'imu/gyr_y', 'imu/gyr_z']
+
+            class Vectorizer:
+                def run(self, *components):
+                    return components
+
+            V.add(Vectorizer, inputs=['imu/acl_x', 'imu/acl_y', 'imu/acl_z',
+                                      'imu/gyr_x', 'imu/gyr_y', 'imu/gyr_z'],
+                  outputs=['imu_array'])
+
+            inputs = ['cam/image_array', 'imu_array']
         else:
             inputs = ['cam/image_array']
 
@@ -401,17 +407,30 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None,
     # stop at a stop sign
     #
     if cfg.STOP_SIGN_DETECTOR:
-        from donkeycar.parts.object_detector.stop_sign_detector \
-            import StopSignDetector
-        V.add(StopSignDetector(cfg.STOP_SIGN_MIN_SCORE,
-                               cfg.STOP_SIGN_SHOW_BOUNDING_BOX,
-                               cfg.STOP_SIGN_MAX_REVERSE_COUNT,
-                               cfg.STOP_SIGN_REVERSE_THROTTLE),
-              inputs=['cam/image_array', 'pilot/throttle'],
-              outputs=['pilot/throttle', 'cam/image_array'])
-        V.add(ThrottleFilter(), 
-              inputs=['pilot/throttle'],
-              outputs=['pilot/throttle'])
+        if cfg.STOP_SIGN_DETECTOR_ACCELERATOR:
+            from donkeycar.parts.object_detector.stop_sign_detector \
+                import StopSignDetector
+            V.add(StopSignDetector(cfg.STOP_SIGN_MIN_SCORE,
+                                cfg.STOP_SIGN_SHOW_BOUNDING_BOX,
+                                cfg.STOP_SIGN_MAX_REVERSE_COUNT,
+                                cfg.STOP_SIGN_REVERSE_THROTTLE),
+                inputs=['cam/image_array', 'pilot/throttle'],
+                outputs=['pilot/throttle', 'cam/image_array'])
+            V.add(ThrottleFilter(), 
+                inputs=['pilot/throttle'],
+                outputs=['pilot/throttle'])
+        else:
+            from donkeycar.parts.object_detector.stop_sign_detector_Tensorflow \
+                import StopSignDetector
+            V.add(StopSignDetector(
+                                cfg.STOP_SIGN_SHOW_BOUNDING_BOX,
+                                cfg.STOP_SIGN_MAX_REVERSE_COUNT,
+                                cfg.STOP_SIGN_REVERSE_THROTTLE),
+                inputs=['cam/image_array', 'pilot/throttle'],
+                outputs=['pilot/throttle', 'cam/image_array'])
+            V.add(ThrottleFilter(), 
+                inputs=['pilot/throttle'],
+                outputs=['pilot/throttle'])
 
     #
     # to give the car a boost when starting ai mode in a race.
