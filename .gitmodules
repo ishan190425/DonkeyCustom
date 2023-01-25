@@ -1,3 +1,3 @@
-[submodule "Tensorflow/--force"]
-	path = Tensorflow/--force
+[submodule "Tensorflow/models"]
+	path = Tensorflow/models
 	url = https://github.com/tensorflow/models.git
