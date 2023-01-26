@@ -19,7 +19,7 @@ class StopSignDetector(object):
 
     
     def __init__(self, show_bounding_box, max_reverse_count=0, reverse_throttle=-0.5, debug=False):
-        self.cfg = dk.load_config(config_path='~/mycar/config.py')
+        self.cfg = dk.load_config(config_path='/home/pi/mycar/myconfig.py')
         args = docopt(__doc__)
         MODEL_NAME = self.cfg.STOP_SIGN_MODEL
         PATH_TO_MODEL_DIR = self.download_model(MODEL_NAME)
