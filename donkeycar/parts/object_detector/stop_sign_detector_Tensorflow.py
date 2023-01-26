@@ -30,7 +30,7 @@ class StopSignDetector(object):
 
         self.category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS,
                                                                     use_display_name=True)
-        self.model = tf.saved_model.load(PATH_TO_SAVED_MODEL)
+        self.model = tf.saved_model.load_v2(PATH_TO_SAVED_MODEL)
         self.detect_fn = self.model.signatures['serving_default']
 
 
