@@ -72,7 +72,7 @@ print('Loading model...', end='')
 start_time = time.time()
 
 # Load saved model and build the detection function
-model = tf.saved_model.load(PATH_TO_SAVED_MODEL,None,None)
+model = tf.saved_model.load_v2(PATH_TO_SAVED_MODEL)
 detect_fn = model.signatures['serving_default']
 
 end_time = time.time()
