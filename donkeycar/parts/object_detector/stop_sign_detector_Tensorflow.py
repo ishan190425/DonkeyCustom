@@ -44,7 +44,7 @@ class StopSignDetector(object):
         self.is_reversing = False
 
     # Download and extract model
-    def download_model(model_name):
+    def download_model(self,model_name):
         if os.path.isdir("Tensorflow/models/{}".format(model_name)):
             print("Found model!")
             return "Tensorflow/models/{}".format(model_name)
@@ -57,7 +57,7 @@ class StopSignDetector(object):
 
 
     # Download labels file
-    def download_labels(filename):
+    def download_labels(self,filename):
         if os.path.isdir("Tensorflow/Labels/{}".format(filename)):
             print("Found model!")
             return "Tensorflow/Labels/{}".format(filename)
