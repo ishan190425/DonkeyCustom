@@ -22,7 +22,7 @@ class StopSignDetector(object):
         self.cfg = dk.load_config(config_path='/home/pi/mycar/config.py')
         MODEL_NAME = self.cfg.STOP_SIGN_MODEL
         PATH_TO_MODEL_DIR = self.download_model(MODEL_NAME)
-        PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/saved_model"
+        PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/frozen_inference_graph.pb"
         
         detection_graph = tf.Graph()
         with detection_graph.as_default():
