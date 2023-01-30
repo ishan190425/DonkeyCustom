@@ -9,6 +9,12 @@ import pathlib
 import donkeycar as dk
 from docopt import docopt
 
+# Patch the location of gfile
+tf.gfile = tf.io.gfile
+
+# Enable Eager Execution for Tensorflow Version < 2
+tf.compat.v1.enable_eager_execution()
+     
 
 class StopSignDetector(object):
     '''
@@ -105,10 +111,13 @@ class StopSignDetector(object):
         input_tensor = input_tensor[tf.newaxis, ...]
     
         output_dict = self.model(input_tensor)
-        # All outputs are batches tensors.
+        
         # Convert to numpy arrays, and take index [0] to remove the batch dimension.
         # We're only interested in the first num_detections.
         num_detections = int(output_dict.pop('num_detections'))
+        output_dict = {key: value[0, :num_detections].numpy()
+                       for key, value in output_dict.items()}
+        # All outputs are batches tensors.
 
         output_dict['num_detections'] = num_detections
 
