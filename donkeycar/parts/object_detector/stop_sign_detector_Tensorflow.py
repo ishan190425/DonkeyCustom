@@ -8,6 +8,7 @@ from object_detection.utils import visualization_utils as viz_utils
 import pathlib
 import donkeycar as dk
 from docopt import docopt
+import cv2
 
 # Patch the location of gfile
 tf.gfile = tf.io.gfile
@@ -142,6 +143,8 @@ class StopSignDetector(object):
                     use_normalized_coordinates=True,
                     line_thickness=8)
 
+        cv2.imshow("Stop Sign", image_np_with_detections)
+        
         return traffic_light_obj
 
     
