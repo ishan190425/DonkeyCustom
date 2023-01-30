@@ -105,18 +105,19 @@ class StopSignDetector(object):
         input_tensor = input_tensor[tf.newaxis, ...]
         
         detections = self.detect_fn(input_tensor)
-
+        output_dict = self.model(input_tensor)
         # All outputs are batches tensors.
         # Convert to numpy arrays, and take index [0] to remove the batch dimension.
         # We're only interested in the first num_detections.
-        num_detections = int(detections.pop('num_detections'))
+        num_detections = int(output_dict.pop('num_detections'))
         detections = {key: value[0, :num_detections].numpy()
                     for key, value in detections.items()}
-        detections['num_detections'] = num_detections
+        output_dict['num_detections'] = num_detections
 
         # detection_classes should be ints.
-        detections['detection_classes'] = detections['detection_classes'].astype(np.int64)
-
+        output_dict['detection_classes'] = output_dict['detection_classes'].astype(np.int64)
+        
+        
         image_np_with_detections = image_np.copy()
 
         
@@ -125,14 +126,13 @@ class StopSignDetector(object):
             if self.show_bounding_box:
                 viz_utils.visualize_boxes_and_labels_on_image_array(
                     image_np_with_detections,
-                    detections['detection_boxes'],
-                    detections['detection_classes'],
-                    detections['detection_scores'],
+                    output_dict['detection_boxes'],
+                    output_dict['detection_classes'],
+                    output_dict['detection_scores'],
                     self.category_index,
+                    instance_masks=output_dict.get('detection_masks_reframed', None),
                     use_normalized_coordinates=True,
-                    max_boxes_to_draw=200,
-                    min_score_thresh=.30,
-                    agnostic_mode=False)
+                    line_thickness=8)
 
         return traffic_light_obj
 
