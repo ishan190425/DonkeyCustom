@@ -24,6 +24,17 @@ class StopSignDetector(object):
         PATH_TO_MODEL_DIR = self.download_model(MODEL_NAME)
         PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/saved_model"
         
+        detection_graph = tf.Graph()
+        with detection_graph.as_default():
+            od_graph_def = tf.GraphDef()
+            with tf.gfile.GFile(PATH_TO_MODEL_DIR, 'rb') as fid:
+                serialized_graph = fid.read()
+                od_graph_def.ParseFromString(serialized_graph)
+                tf.import_graph_def(od_graph_def, name='')
+
+            sess = tf.Session(graph=detection_graph)
+        
+        
         LABEL_FILENAME = 'mscoco_label_map.pbtxt'
         PATH_TO_LABELS = self.download_labels(LABEL_FILENAME)
 
@@ -103,7 +114,7 @@ class StopSignDetector(object):
         input_tensor = tf.convert_to_tensor(image_np)
         # The model expects a batch of images, so add an axis with `tf.newaxis`.
         input_tensor = input_tensor[tf.newaxis, ...]
-
+        
         detections = self.detect_fn(input_tensor)
 
         # All outputs are batches tensors.

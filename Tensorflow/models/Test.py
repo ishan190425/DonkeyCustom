@@ -21,8 +21,10 @@ for gpu in gpus:
 
 def images():
     image_paths = []
-    for (root, dirs, file) in os.walk('Tensorflow/test_images'):
+    for (root, dirs, file) in os.walk('test_images/'):
         for name in file:
+            if name == ".DS_Store":
+                continue
             image_paths.append(os.path.join(root, name))
     return image_paths
 
@@ -72,7 +74,7 @@ print('Loading model...', end='')
 start_time = time.time()
 
 # Load saved model and build the detection function
-model = tf.saved_model.load_v2(PATH_TO_SAVED_MODEL)
+model = tf.saved_model.load(PATH_TO_SAVED_MODEL)
 detect_fn = model.signatures['serving_default']
 
 end_time = time.time()
@@ -122,11 +124,11 @@ for image_path in IMAGE_PATHS:
     input_tensor = input_tensor[tf.newaxis, ...]
 
     detections = detect_fn(input_tensor)
-
     # All outputs are batches tensors.
     # Convert to numpy arrays, and take index [0] to remove the batch dimension.
     # We're only interested in the first num_detections.
     num_detections = int(detections.pop('num_detections'))
+    print(num_detections)
     detections = {key: value[0, :num_detections].numpy()
                   for key, value in detections.items()}
     detections['num_detections'] = num_detections
