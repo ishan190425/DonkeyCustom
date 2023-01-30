@@ -128,8 +128,10 @@ class StopSignDetector(object):
         traffic_light_obj = False
         
         if self.STOP_SIGN_CLASS_ID in output_dict['detection_classes']:
+            print("Found stop sign!")
             traffic_light_obj = True
             if self.show_bounding_box:
+                print("Showing stop sign!")
                 viz_utils.visualize_boxes_and_labels_on_image_array(
                     image_np_with_detections,
                     output_dict['detection_boxes'],
