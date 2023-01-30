@@ -103,15 +103,13 @@ class StopSignDetector(object):
         input_tensor = tf.convert_to_tensor(image_np)
         # The model expects a batch of images, so add an axis with `tf.newaxis`.
         input_tensor = input_tensor[tf.newaxis, ...]
-        
-        detections = self.detect_fn(input_tensor)
+    
         output_dict = self.model(input_tensor)
         # All outputs are batches tensors.
         # Convert to numpy arrays, and take index [0] to remove the batch dimension.
         # We're only interested in the first num_detections.
         num_detections = int(output_dict.pop('num_detections'))
-        detections = {key: value[0, :num_detections].numpy()
-                    for key, value in detections.items()}
+
         output_dict['num_detections'] = num_detections
 
         # detection_classes should be ints.
@@ -121,7 +119,7 @@ class StopSignDetector(object):
         image_np_with_detections = image_np.copy()
 
         
-        if self.STOP_SIGN_CLASS_ID in detections['detection_classes']:
+        if self.STOP_SIGN_CLASS_ID in output_dict['detection_classes']:
             traffic_light_obj = True
             if self.show_bounding_box:
                 viz_utils.visualize_boxes_and_labels_on_image_array(
