@@ -126,7 +126,7 @@ class StopSignDetector(object):
         
         
         image_np_with_detections = image_np.copy()
-
+        traffic_light_obj = False
         
         if self.STOP_SIGN_CLASS_ID in output_dict['detection_classes']:
             traffic_light_obj = True
