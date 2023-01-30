@@ -22,25 +22,14 @@ class StopSignDetector(object):
         self.cfg = dk.load_config(config_path='/home/pi/mycar/config.py')
         MODEL_NAME = self.cfg.STOP_SIGN_MODEL
         PATH_TO_MODEL_DIR = self.download_model(MODEL_NAME)
-        PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/frozen_inference_graph.pb"
-        
-        detection_graph = tf.Graph()
-        with detection_graph.as_default():
-            od_graph_def = tf.GraphDef()
-            with tf.gfile.GFile(PATH_TO_MODEL_DIR, 'rb') as fid:
-                serialized_graph = fid.read()
-                od_graph_def.ParseFromString(serialized_graph)
-                tf.import_graph_def(od_graph_def, name='')
-
-            sess = tf.Session(graph=detection_graph)
-        
+        PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/saved_model"
         
         LABEL_FILENAME = 'mscoco_label_map.pbtxt'
         PATH_TO_LABELS = self.download_labels(LABEL_FILENAME)
 
         self.category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS,
                                                                     use_display_name=True)
-        self.model = tf.saved_model.load_v2(PATH_TO_SAVED_MODEL)
+        self.model = tf.compat.v2.saved_model.load(PATH_TO_SAVED_MODEL)
         self.detect_fn = self.model.signatures['serving_default']
 
 
