@@ -38,8 +38,7 @@ class StopSignDetector(object):
         self.model = tf.compat.v2.saved_model.load(PATH_TO_SAVED_MODEL)
         self.model = self.model.signatures['serving_default']
 
-
-        self.show_bounding_box = show_bounding_box
+        self.show_bounding_box = self.cfg.STOP_SIGN_SHOW_BOUNDING_BOX
         self.STOP_SIGN_CLASS_ID = 13
         self.debug = debug
 
