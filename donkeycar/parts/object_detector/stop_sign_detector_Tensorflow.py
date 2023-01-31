@@ -24,10 +24,8 @@ class StopSignDetector(object):
     @author:Ishan190425
     '''
 
-    
-    def __init__(self, show_bounding_box, max_reverse_count=0, reverse_throttle=-0.5, debug=False):
-        self.cfg = dk.load_config(config_path='/home/pi/mycar/config.py')
-        MODEL_NAME = self.cfg.STOP_SIGN_MODEL
+    def __init__(self, show_bounding_box, max_reverse_count=0, reverse_throttle=-0.5, debug=False, model_name='ssd_mobilenet_v2_coco_2018_03_29'):
+        MODEL_NAME = model_name
         PATH_TO_MODEL_DIR = self.download_model(MODEL_NAME)
         PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/saved_model"
         
@@ -39,7 +37,7 @@ class StopSignDetector(object):
         self.model = tf.compat.v2.saved_model.load(PATH_TO_SAVED_MODEL)
         self.model = self.model.signatures['serving_default']
 
-        self.show_bounding_box = self.cfg.STOP_SIGN_SHOW_BOUNDING_BOX
+        self.show_bounding_box = show_bounding_box
         self.STOP_SIGN_CLASS_ID = 13
         self.debug = debug
 

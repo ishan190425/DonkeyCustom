@@ -425,7 +425,8 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None,
             V.add(StopSignDetector(
                                 cfg.STOP_SIGN_SHOW_BOUNDING_BOX,
                                 cfg.STOP_SIGN_MAX_REVERSE_COUNT,
-                                cfg.STOP_SIGN_REVERSE_THROTTLE),
+                                cfg.STOP_SIGN_REVERSE_THROTTLE,
+                                cfg.STOP_SIGN_MODEL),
                 inputs=['cam/image_array', 'pilot/throttle'],
                 outputs=['pilot/throttle', 'cam/image_array'])
             V.add(ThrottleFilter(), 
