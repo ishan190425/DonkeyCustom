@@ -83,7 +83,7 @@ apple_silicon = Checkbox(text_rect.x - 50, text_rect.y - 120, 20, "Apple Silicon
 # Start event loop
 running = True
 start = False
-state = 0
+state = -1
 currentText = ""
 while running:
     for event in pygame.event.get():
@@ -96,6 +96,7 @@ while running:
             if button_rect.collidepoint(event.pos):
                 # Start progress
                 start = True
+                state = 0
             nvidia_gpu_checkbox.collidepoint(event.pos)
             miniconda_checkbox.collidepoint(event.pos)
             apple_silicon.collidepoint(event.pos)
