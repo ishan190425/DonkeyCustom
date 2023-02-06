@@ -3,8 +3,11 @@ import os
 import time
 import numpy as np
 from PIL import Image
+import pygame.image
 import glob
+import cv2
 from donkeycar.utils import rgb2gray
+import random
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -158,13 +161,87 @@ class Webcam(BaseCamera):
                                " make sure your 'CAMERA_INDEX' is correct in myconfig.py") from e
         logger.info("Webcam ready.")
 
+    def greyscale(self,surface):
+       
+        #arr = pygame.surfarray.pixels3d(surface)
+        arr = surface
+        mean_arr = np.dot(arr[:,:,:], [0.216, 0.587, 0.144])
+        mean_arr3d = mean_arr[..., np.newaxis]
+        new_arr = np.repeat(mean_arr3d[:, :, :], 3, axis=2)
+        new_arr = self.identify_table_lines(new_arr)
+        #self.show_image(thresh,"Threshold - 2")
+        return new_arr
+    def noise(self,image):
+        noise_factor = 0.8
+        mask = image==0
+        c = np.count_nonzero(mask)
+        threshold_prob = noise_factor * 100
+        nums = np.random.randint(1,100,c)
+        vals = np.where(nums <= threshold_prob,np.random.randint(1,6,c),0)
+        image[mask] = vals
+
+    def identify_table_lines(self,image):
+        
+        # Apply Gaussian blur to smooth the image and reduce noise
+        blur = cv2.GaussianBlur(image, (5, 5), 0)
+        blur = blur.astype(np.uint8)
+        #print(blur)
+        # Apply Canny edge detection to find the edges in the image
+        edges = cv2.Canny(blur, 50, 150)
+        #self.show_image(edges,"Edges")
+        
+        rho = 10  # distance resolution in pixels of the Hough grid
+        
+        theta = np.pi / 180  # angular resolution in radians of the Hough grid
+        
+        threshold = 20  # minimum number of votes (intersections in Hough grid cell)
+        
+        min_line_length = 90  # minimum number of pixels making up a line
+        
+        max_line_gap = 1  # maximum gap in pixels between connectable line segments
+        
+        line_image = np.copy(edges) * 0  # creating a blank to draw lines on
+
+        # Run Hough on edge detected image
+        # Find the lines in the image using Hough line transformation
+        lines = cv2.HoughLinesP(edges, rho, theta, threshold, np.array([]),
+                            min_line_length, max_line_gap)
+    
+        
+        # Extract the rows and columns of the table
+        #rows, cols = self.extract_rows_and_cols(lines,line_image,image)
+        
+        lines_edges = cv2.addWeighted(edges, 0.8, line_image, 1, 0)
+        self.noise(lines_edges)
+        
+        #self.show_image(lines_edges,"Lines")
+        
+        return lines_edges
+    
     def run(self):
-        import pygame.image
+        
         if self.cam.query_image():
             snapshot = self.cam.get_image()
             if snapshot is not None:
                 snapshot1 = pygame.transform.scale(snapshot, self.resolution)
-                self.frame = pygame.surfarray.pixels3d(pygame.transform.rotate(pygame.transform.flip(snapshot1, True, False), 90))
+                self.old_frame = pygame.surfarray.pixels3d(pygame.transform.rotate(pygame.transform.flip(snapshot1, True, False), 90))
+                #print("old: {}".format(self.frame.shape))
+                self.old_frame = self.greyscale(self.old_frame)
+                h,w = self.old_frame.shape
+                #print(h,w)
+                # mask = np.zeros((h,w),dtype=np.uint8)
+                # self.noise(mask)
+                # points = np.array([[[0,120],[0, 80], [40,60],[120,60],[160, 80], [160,120]]])
+                # cv2.fillPoly(mask,points,(255))
+                # self.old_frame = cv2.bitwise_and(self.old_frame,self.old_frame,mask = mask)
+                
+                #self.old_frame[:(1*len(self.old_frame))//2] = 0
+                #self.frame = np.reshape(self.frame.shape[0],self.frame.shape[1],3)
+                #h,w = self.old_frame.shape
+                color_img = np.zeros([h,w,3])
+                color_img[:,:,1]=self.old_frame
+                self.frame = color_img
+                #print("new: {}".format(self.frame.shape))
                 if self.image_d == 1:
                     self.frame = rgb2gray(frame)
 
