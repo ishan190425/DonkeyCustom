@@ -6,7 +6,7 @@ import numpy as np
 import os
 import urllib.request
 import numpy as np
-import tensorflow.lite as tf
+import tensorflow as tf
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
 import pathlib
