@@ -19,7 +19,19 @@ tf.gfile = tf.io.gfile
 
 # Enable Eager Execution for Tensorflow Version < 2
 tf.compat.v1.enable_eager_execution()
-     
+
+num_threads = 4
+os.environ["OMP_NUM_THREADS"] = "4"
+os.environ["TF_NUM_INTRAOP_THREADS"] = "4"
+os.environ["TF_NUM_INTEROP_THREADS"] = "4"
+
+tf.config.threading.set_inter_op_parallelism_threads(
+    num_threads
+)
+tf.config.threading.set_intra_op_parallelism_threads(
+    num_threads
+)
+tf.config.set_soft_device_placement(True)
 
 class StopSignDetector(object):
     '''
