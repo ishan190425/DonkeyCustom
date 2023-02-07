@@ -57,12 +57,11 @@ class StopSignDetector(object):
         # self.STOP_SIGN_CLASS_ID = 13
         # self.debug = debug
 
-        # # reverse throttle related
-        # self.max_reverse_count = max_reverse_count
-        # self.reverse_count = max_reverse_count
-        # self.reverse_throttle = reverse_throttle
-        # self.is_reversing = False
-        pass
+        # reverse throttle related
+        self.max_reverse_count = max_reverse_count
+        self.reverse_count = max_reverse_count
+        self.reverse_throttle = reverse_throttle
+        self.is_reversing = False
 
     # # Download and extract model
     # def download_model(self,model_name):
