@@ -174,7 +174,8 @@ class StopSignDetector(object):
 
         # Detect traffic light object
         traffic_light_obj = self.detect_stop_sign(img_arr)
-
+        if traffic_light_obj:
+            print("Found Stop Sign!")
         if traffic_light_obj or self.is_reversing:
             # Set the throttle to reverse within the max reverse count when detected the traffic light object
             if self.reverse_count < self.max_reverse_count:
