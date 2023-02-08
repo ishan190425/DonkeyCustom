@@ -30,6 +30,8 @@ def images():
 
 
 IMAGE_PATHS = images()
+print(IMAGE_PATHS)
+IMAGE_PATHS.append("Tensorflow/test_images/IMG_3357.jpg")
 
 # Download and extract model
 
@@ -128,7 +130,6 @@ for image_path in IMAGE_PATHS:
     # Convert to numpy arrays, and take index [0] to remove the batch dimension.
     # We're only interested in the first num_detections.
     num_detections = int(detections.pop('num_detections'))
-    print(num_detections)
     detections = {key: value[0, :num_detections].numpy()
                   for key, value in detections.items()}
     detections['num_detections'] = num_detections

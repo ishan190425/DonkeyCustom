@@ -13,7 +13,8 @@ import pathlib
 import donkeycar as dk
 from docopt import docopt
 import cv2
-
+from tensorflow.keras.models import load_model
+import pickle
 # Patch the location of gfile
 tf.gfile = tf.io.gfile
 
@@ -41,17 +42,17 @@ class StopSignDetector(object):
     '''
 
     def __init__(self, show_bounding_box, max_reverse_count=0, reverse_throttle=-0.5, debug=False, model_name='ssd_mobilenet_v2_coco_2018_03_29'):
-        MODEL_NAME = model_name
-        PATH_TO_MODEL_DIR = self.download_model(MODEL_NAME)
-        PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/saved_model"
+        # MODEL_NAME = model_name
+        # PATH_TO_MODEL_DIR = self.download_model(MODEL_NAME)
+        # PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/saved_model"
         
-        LABEL_FILENAME = 'mscoco_label_map.pbtxt'
-        PATH_TO_LABELS = self.download_labels(LABEL_FILENAME)
+        # LABEL_FILENAME = 'mscoco_label_map.pbtxt'
+        # PATH_TO_LABELS = self.download_labels(LABEL_FILENAME)
 
-        self.category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS,
-                                                                    use_display_name=True)
-        self.model = tf.compat.v2.saved_model.load(PATH_TO_SAVED_MODEL)
-        self.model = self.model.signatures['serving_default']
+        # self.category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS,
+        #                                                             use_display_name=True)
+        self.model = load_model("./model_bbox_regression_and_classification")
+        self.lb = pickle.loads(open("./lb.pickle", "rb").read())
 
         self.show_bounding_box = show_bounding_box
         self.STOP_SIGN_CLASS_ID = 13
@@ -109,56 +110,60 @@ class StopSignDetector(object):
     '''
     def detect_stop_sign (self, img_arr):
 
-        image_np = self.load_image_into_numpy_array(img_arr)
+        image_np = self.load_image_into_numpy_array(img_arr) / 255.0
+        image_np = np.expand_dims(image_np, axis=0)
+        labelPreds = self.model.predict(image_np)
+        # finding class label with highest pred. probability
+        i = np.argmax(labelPreds, axis=1)
+        label = self.lb.classes_[i][0]
+        # # Things to try:
+        # # Flip horizontally
+        # # image_np = np.fliplr(image_np).copy()
 
-        # Things to try:
-        # Flip horizontally
-        # image_np = np.fliplr(image_np).copy()
+        # # Convert image to grayscale
+        # # image_np = np.tile(
+        # #     np.mean(image_np, 2, keepdims=True), (1, 1, 3)).astype(np.uint8)
 
-        # Convert image to grayscale
-        # image_np = np.tile(
-        #     np.mean(image_np, 2, keepdims=True), (1, 1, 3)).astype(np.uint8)
-
-        # The input needs to be a tensor, convert it using `tf.convert_to_tensor`.
-        input_tensor = tf.convert_to_tensor(image_np)
-        # The model expects a batch of images, so add an axis with `tf.newaxis`.
-        input_tensor = input_tensor[tf.newaxis, ...]
+        # # The input needs to be a tensor, convert it using `tf.convert_to_tensor`.
+        # input_tensor = tf.convert_to_tensor(image_np)
+        # # The model expects a batch of images, so add an axis with `tf.newaxis`.
+        # input_tensor = input_tensor[tf.newaxis, ...]
     
-        output_dict = self.model(input_tensor)
+        # output_dict = self.model(input_tensor)
         
-        # Convert to numpy arrays, and take index [0] to remove the batch dimension.
-        # We're only interested in the first num_detections.
-        num_detections = int(output_dict.pop('num_detections'))
-        output_dict = {key: value[0, :num_detections].numpy()
-                       for key, value in output_dict.items()}
-        # All outputs are batches tensors.
+        # # Convert to numpy arrays, and take index [0] to remove the batch dimension.
+        # # We're only interested in the first num_detections.
+        # num_detections = int(output_dict.pop('num_detections'))
+        # output_dict = {key: value[0, :num_detections].numpy()
+        #                for key, value in output_dict.items()}
+        # # All outputs are batches tensors.
 
-        output_dict['num_detections'] = num_detections
+        # output_dict['num_detections'] = num_detections
 
-        # detection_classes should be ints.
-        output_dict['detection_classes'] = output_dict['detection_classes'].astype(np.int64)
+        # # detection_classes should be ints.
+        # output_dict['detection_classes'] = output_dict['detection_classes'].astype(np.int64)
         
         
-        image_np_with_detections = image_np.copy()
-        traffic_light_obj = False
+        # image_np_with_detections = image_np.copy()
+        # traffic_light_obj = False
         
-        if self.STOP_SIGN_CLASS_ID in output_dict['detection_classes']:
-            print("Found stop sign!")
-            traffic_light_obj = True
-            if self.show_bounding_box:
-                print("Showing stop sign!")
-                viz_utils.visualize_boxes_and_labels_on_image_array(
-                    image_np_with_detections,
-                    output_dict['detection_boxes'],
-                    output_dict['detection_classes'],
-                    output_dict['detection_scores'],
-                    self.category_index,
-                    instance_masks=output_dict.get('detection_masks_reframed', None),
-                    use_normalized_coordinates=True,
-                    line_thickness=8)
+        # if self.STOP_SIGN_CLASS_ID in output_dict['detection_classes']:
+        #     print("Found stop sign!")
+        #     traffic_light_obj = True
+        #     if self.show_bounding_box:
+        #         print("Showing stop sign!")
+        #         viz_utils.visualize_boxes_and_labels_on_image_array(
+        #             image_np_with_detections,
+        #             output_dict['detection_boxes'],
+        #             output_dict['detection_classes'],
+        #             output_dict['detection_scores'],
+        #             self.category_index,
+        #             instance_masks=output_dict.get('detection_masks_reframed', None),
+        #             use_normalized_coordinates=True,
+        #             line_thickness=8)
 
-        cv2.imshow("Stop Sign", image_np_with_detections)
-        
+        # cv2.imshow("Stop Sign", image_np_with_detections)
+        traffic_light_obj = label == "stop"
         return traffic_light_obj
 
     
