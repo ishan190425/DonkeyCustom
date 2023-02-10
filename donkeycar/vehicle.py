@@ -13,6 +13,7 @@ from threading import Thread
 from .memory import Memory
 from prettytable import PrettyTable
 import traceback
+import parts.camera
 
 logger = logging.getLogger(__name__)
 
@@ -191,6 +192,10 @@ class Vehicle:
             if run:
                 # get part
                 p = entry['part']
+
+                if p == type(parts.camera):
+                    image = p.getOriginalImage()
+                    self.mem.addOriginalImage(image)
                 # start timing part run
                 self.profiler.on_part_start(p)
                 # get inputs from memory

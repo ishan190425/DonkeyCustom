@@ -12,6 +12,7 @@ class Memory:
     """
     def __init__(self, *args, **kw):
         self.d = {}
+        self.image = None
     
     def __setitem__(self, key, value):
         if type(key) is str:
@@ -58,4 +59,10 @@ class Memory:
     
     def items(self):
         return self.d.items()
+
+    def addOriginalImage(self,image):
+        self.image = image
+    
+    def getOriginalImage(self):
+        return self.image
         

@@ -105,6 +105,7 @@ class Webcam(BaseCamera):
         # initialize variable used to indicate
         # if the thread should be stopped
         self.frame = None
+        self.originalImage = None
         self.image_d = image_d
         self.image_w = image_w
         self.image_h = image_h
@@ -226,6 +227,7 @@ class Webcam(BaseCamera):
                 snapshot1 = pygame.transform.scale(snapshot, self.resolution)
                 self.old_frame = pygame.surfarray.pixels3d(pygame.transform.rotate(pygame.transform.flip(snapshot1, True, False), 90))
                 #print("old: {}".format(self.frame.shape))
+                self.originalImage = self.old_frame
                 self.old_frame = self.greyscale(self.old_frame)
                 h,w = self.old_frame.shape
                 #print(h,w)
@@ -246,6 +248,9 @@ class Webcam(BaseCamera):
                     self.frame = rgb2gray(frame)
 
         return self.frame
+    
+    def getOriginalImage(self):
+        return self.originalImage
 
     def update(self):	
         from datetime import datetime, timedelta
