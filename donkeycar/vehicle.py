@@ -13,7 +13,10 @@ from threading import Thread
 from .memory import Memory
 from prettytable import PrettyTable
 import traceback
-
+import donkeycar
+import os
+import PIL
+import pickle
 logger = logging.getLogger(__name__)
 
 
@@ -68,6 +71,7 @@ class Vehicle:
         self.on = True
         self.threads = []
         self.profiler = PartProfiler()
+        self.cfg = donkeycar.load_config()
 
     def add(self, part, inputs=[], outputs=[],
             threaded=False, run_condition=None):
@@ -193,18 +197,30 @@ class Vehicle:
                 p = entry['part']
                 # start timing part run
                 self.profiler.on_part_start(p)
-                # get inputs from memory
-                inputs = self.mem.get(entry['inputs'])
-                # run the part
-                if entry.get('thread'):
-                    outputs = p.run_threaded(*inputs)
+                if (self.cfg.STOP_SIGN_DETECTOR and type(p)== donkeycar.parts.object_detector.stop_sign_detector_Tensorflow.StopSignDetector):
+                    if os.path.exists("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/stop.pickle"):
+                        with open('/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/stop.pickle',"rb") as file:
+                            outputs = pickle.load(file)
+                            self.mem.put(entry['outputs'], outputs)
+                    img = self.mem.get_old_image() 
+                    im = PIL.Image.fromarray(img)
+                    im.save("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/img.jpg")
                 else:
-                    outputs = p.run(*inputs)
+                    # get inputs from memory
+                    inputs = self.mem.get(entry['inputs'])
+                    # run the part
+                    if entry.get('thread'):
+                        outputs = p.run_threaded(*inputs)
+                    else:
+                        outputs = p.run(*inputs)
 
-                # save the output to memory
-                if outputs is not None:
-                    self.mem.put(entry['outputs'], outputs)
-                # finish timing part run
+                    # save the output to memory
+                    if outputs is not None:
+                        self.mem.put(entry['outputs'], outputs)
+                    if type(p) == donkeycar.parts.camera.Webcam:
+                        img = p.get_old_image()
+                        self.mem.add_old_image(img)
+                    # finish timing part run
                 self.profiler.on_part_finished(p)
 
     def stop(self):        

@@ -15,6 +15,21 @@ from docopt import docopt
 import cv2
 from tensorflow.keras.models import load_model
 import pickle
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Input
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.preprocessing.image import img_to_array
+from tensorflow.keras.preprocessing.image import load_img
+from tensorflow.keras.models import load_model
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.utils import to_categorical
+from sklearn.preprocessing import LabelBinarizer
+import time
+import PIL
 # Patch the location of gfile
 tf.gfile = tf.io.gfile
 
@@ -51,8 +66,8 @@ class StopSignDetector(object):
 
         # self.category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS,
         #                                                             use_display_name=True)
-        self.model = load_model("./model_bbox_regression_and_classification")
-        self.lb = pickle.loads(open("./lb.pickle", "rb").read())
+        # self.model = load_model("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/model_bbox_regression_and_classification",custom_objects={'Functional':tf.keras.models.Model})
+        self.lb = pickle.loads(open("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/lb.pickle", "rb").read())
 
         self.show_bounding_box = show_bounding_box
         self.STOP_SIGN_CLASS_ID = 13
@@ -63,6 +78,38 @@ class StopSignDetector(object):
         self.reverse_count = max_reverse_count
         self.reverse_throttle = reverse_throttle
         self.is_reversing = False
+
+
+        vgg = VGG16(weights="imagenet",
+                    include_top=False,
+                    input_tensor=Input(shape=(120, 160, 3)))
+
+        # freeze training any of the layers of VGGNet
+        vgg.trainable = False
+
+        # max-pooling is output of VGG, flattening it further
+        flatten = vgg.output
+        flatten = Flatten()(flatten)
+        # 4 neurons correspond to 4 co-ords in output bbox
+        softmaxHead = Dense(512, activation="relu")(flatten)
+        softmaxHead = Dropout(0.5)(softmaxHead)
+        softmaxHead = Dense(512, activation="relu")(softmaxHead)
+        softmaxHead = Dropout(0.5)(softmaxHead)
+        softmaxHead = Dense(len(self.lb.classes_), activation="softmax",
+                            name="class_label")(softmaxHead)
+        model = Model(
+            inputs=vgg.input,
+            outputs=(softmaxHead))
+        INIT_LR = 1e-4
+        NUM_EPOCHS = 10
+        BATCH_SIZE = 16
+        self.index = 0
+        opt = Adam(INIT_LR)
+
+        model.compile(loss = tf.keras.losses.categorical_crossentropy)
+        model.load_weights("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/model_bbox_regression_and_classification_weights")
+        self.model = model
+
 
     # Download and extract model
     def download_model(self,model_name):
@@ -108,14 +155,21 @@ class StopSignDetector(object):
     '''
     Return an object if there is a traffic light in the frame
     '''
-    def detect_stop_sign (self, img_arr):
-
+    def detect_stop_sign (self, img_arr=None):
+        if not os.path.exists("img.jpg"):
+            return
+        try:
+            img_arr = PIL.Image.open("img.jpg")
+        except:
+            time.sleep(1)
+            self.detect_stop_sign()
         image_np = self.load_image_into_numpy_array(img_arr) / 255.0
         image_np = np.expand_dims(image_np, axis=0)
         labelPreds = self.model.predict(image_np)
         # finding class label with highest pred. probability
         i = np.argmax(labelPreds, axis=1)
         label = self.lb.classes_[i][0]
+        #print("Label Found - {}".format(label))
         # # Things to try:
         # # Flip horizontally
         # # image_np = np.fliplr(image_np).copy()
@@ -164,6 +218,24 @@ class StopSignDetector(object):
 
         # cv2.imshow("Stop Sign", image_np_with_detections)
         traffic_light_obj = label == "stop"
+        value = None
+        if traffic_light_obj or self.is_reversing:
+            # Set the throttle to reverse within the max reverse count when detected the traffic light object
+            if self.reverse_count < self.max_reverse_count:
+                self.is_reversing = True
+                self.reverse_count += 1
+                value = self.reverse_throttle, img_arr
+            else:
+                self.is_reversing = False
+                value = 0, img_arr
+            if traffic_light_obj:
+                print("Found Stop Sign")
+                with open('stop.pickle','wb') as file:
+                    pickle.dump(value,file)
+        elif os.path.exists("stop.pickle"):
+            os.remove("stop.pickle")
+        time.sleep(.01)
+        self.detect_stop_sign()
         return traffic_light_obj
 
     
@@ -171,8 +243,9 @@ class StopSignDetector(object):
     def run(self, img_arr, throttle, debug=False):
         if img_arr is None:
             return throttle, img_arr
-
-        # Detect traffic light object
+        self.index += 1
+        if self.index % 60:
+            return throttle, img_arr 
         traffic_light_obj = self.detect_stop_sign(img_arr)
 
         if traffic_light_obj or self.is_reversing:
@@ -188,6 +261,10 @@ class StopSignDetector(object):
             self.is_reversing = False
             self.reverse_count = 0
             return throttle, img_arr
+
+if __name__ == "__main__":
+    Object = StopSignDetector(show_bounding_box=False)
+    Object.detect_stop_sign()
 
 
 # ######## Webcam Object Detection Using Tensorflow-trained Classifier #########
