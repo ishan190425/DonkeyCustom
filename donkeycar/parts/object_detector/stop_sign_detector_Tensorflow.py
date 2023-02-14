@@ -10,7 +10,6 @@ import tensorflow as tf
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
 import pathlib
-import donkeycar as dk
 from docopt import docopt
 import cv2
 from tensorflow.keras.models import load_model
