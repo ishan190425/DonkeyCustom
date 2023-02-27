@@ -74,7 +74,6 @@ setup(name='donkeycar',
           'pc': [
               'matplotlib',
               'kivy',
-              'protobuf==3.20.3',
               'pandas',
               'pyyaml',
               'plotly',
@@ -89,8 +88,8 @@ setup(name='donkeycar',
           'ci': ['codecov'],
           'tf': ['tensorflow==2.2.0'],
           'torch': [
-              'pytorch',
-              'torchvision==0.12',
+              'pytorch>=1.7.1',
+              'torchvision',
               'torchaudio',
               'fastai'
           ],

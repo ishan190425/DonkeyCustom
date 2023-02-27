@@ -1,24 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <div class="container">
-    <div class="row">
-
-      <div class="col-md-6">
+  <div class="container" style="width: 1200px;  margin: 0 auto; padding-left: 0px; padding-right: 0px">
+    
+      <div class="leftCol" style="text-align: center; width: 280px; height: 600px; float: left; margin: 10px;">
         <!-- pilot mode/recording -->
         <form>
-            <label>(M)ode</label>
-            <select id="mode_select" class="form-control"  style="display: inline">
-              <option value="user">(U)ser</option>
-              <option value="local">Full (A)uto</option>
-              <option value="local_angle">Auto (S)teer</option>
-            </select>
-            <button type="button" id="record_button" class="btn btn-info" >
-              Start (R)ecording
-            </button>
+          <label>Mode</label>
+          <select id="mode_select" class="form-control"  style="display: inline">
+            <option value="user">User</option>
+            <option value="local">Full Auto</option>
+            <option value="local_angle">Auto Steer</option>
+          </select>
+          <button type="button" id="record_button" class="btn btn-info" >
+            Start Recording
+          </button>
         </form>
+      </br>
 
-        <!-- programmable buttons -->
+
+      <!-- programmable buttons -->
         <form id="button_bar">
           <button type="button" id="w1" class="btn btn-info">1</button>
           <button type="button" id="w2" class="btn btn-info">2</button>
@@ -26,13 +27,73 @@
           <button type="button" id="w4" class="btn btn-info">4</button>
           <button type="button" id="w5" class="btn btn-info">5</button>
         </form>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
 
-        <!-- video -->
-        <div class="thumbnail">
-          <img id='mpeg-image', class='img-responsive' src="/video"/> </img>
+        <div>
+          <label class="group-label" style="display: inline">Throttle:</label>
+          <select id="throttle_mode_select" class="form-control" style="display: inline">
+            <option value="user" selected>Maximum</option>
+            <option value="constant">Constant</option>
+          </select>
+          <form id="speedRange" class="slide-container" style="margin-top: 10px" oninput="output.value = parseInt(slider.value)/100">
+            <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="50" 
+                    class="slider"
+                    id="slider"
+                                      
+            />
+            <output id="output" name="output" for="slider"></output>
+            
+          </form>
         </div>
-
-        <!-- steering/throttle meters -->
+      </br>
+   
+        <div>
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-primary" id="joystick-toggle">
+              <input type="radio" name="controlMode" id="joystick" autocomplete="off" value="joystick"> Joystick
+            </label>
+            <label class="btn btn-primary" id="gamepad-toggle">
+              <input type="radio" name="controlMode" id="gamepad" autocomplete="off" value="gamepad"> Gamepad
+            </label>
+            <label class="btn btn-primary" id="tilt-toggle">
+              <input type="radio" name="controlMode" id="tilt" autocomplete="off" value="tilt">Device Tilt
+            </label>
+          </div>
+          <label class="group-label" style="display: inline">
+            <a data-toggle="modal" class="btn btn-primary btn-xs" data-target="#aboutControlModes">
+              <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+          </label>
+        </div>
+      </div>
+      <div class = "midCol" style="text-align: center; width: 600px; height: 600px; float: left;">
+        <!-- video -->
+        <div class="thumbnail" style="height:400px;">
+          <img id='mpeg-image', class='img-responsive' src="/video" style="height:390px; padding:5px"/> </img>
+        </div>
+        <div id="joystick-column" class="middleCol" style="width: 600px;">
+        <!-- virtual joystick -->
+        <div class="form-inline" style="text-align: center;">
+        
+        <div id="joystick_outer" class="thumbnail" style="height:150px;">
+          <div id="joystick_container" style="height: 140px; padding: 5px;">
+            <p>Click/touch to use joystick.</p>
+          </div>
+        </div>
+       
+        </div>
         <div id="control-bars">
           <div>
             <span class="glyphicon glyphicon-resize-horizontal pull-left"></span>
@@ -60,54 +121,47 @@
             </div>
           </div>
         </div>
-      </div> <!-- end video column -->
-
-      <div id="joystick-column"  class="col-md-6">
-        <div style="text-align:center;color:rgb(255, 27, 65);display:inline-block">Note: physical game controller overrides web control.</div>
-        <!-- virtual joystick -->
-        <div id="joystick_outer" class="thumbnail">
-          <div id="joystick_container">
-            <p>Click/touch to use joystick.</p>
-          </div>
-        </div>
-
-        <div class="form-inline">
-          <div>
-            <div class="btn-group" data-toggle="buttons">
-              <label class="btn btn-primary" id="joystick-toggle">
-                <input type="radio" name="controlMode" id="joystick" autocomplete="off" value="joystick"> Joystick
-              </label>
-              <label class="btn btn-primary" id="gamepad-toggle">
-                <input type="radio" name="controlMode" id="gamepad" autocomplete="off" value="gamepad"> Gamepad
-              </label>
-              <label class="btn btn-primary" id="tilt-toggle">
-                <input type="radio" name="controlMode" id="tilt" autocomplete="off" value="tilt">Device Tilt
-              </label>
-            </div>
-            <label class="group-label" style="display: inline">
-              <a data-toggle="modal" class="btn btn-primary btn-xs" data-target="#aboutControlModes">
-                <span class="glyphicon glyphicon-info-sign"></span>
-              </a>
-            </label>
-          </div>
-
-          <br/>
-          <div>
-            <label class="group-label" style="display: inline">Throttle:</label>
-            <select id="throttle_mode_select" class="form-control" style="display: inline">
-              <option value="user" selected>Maximum</option>
-              <option value="constant">Constant</option>
-            </select>
-            <select id="max_throttle_select" class="form-control" style="display: inline">
-              {% for t in [100, 95, 90, 85, 80, 75, 70, 60, 50, 40, 30, 20, 10] %}
-                <option value="{{ t / 100.0 }}">{{ t }}%</option>
-              {% end %}
-            </select>
-          </div>
-        </div>
       </div> <!-- end joystick-column -->
+      </div>
+      
+      <div class="rightCol" style="text-align: center; width: 280px; height: 600px; float: left;">
+        <select id="chart-select" class="form-control" style="display: inline">
+          <option value="battery">Battery</option>
+          <option value="halleffect">Hall Effect</option>
+          <option value="ultrasonic">Ultrasonic</option>
+          <option value="imu">IMU</option>
+          <option value="temperature">Temperature</option>
+          <option value="humidity">Humidity</option>
+        </select>
+        
+        <div id="chartGroup1" class="sensorDataSmall data-container" >
+          <div id="battery">
+            <canvas id="batChart" height="400px"></canvas>
+          </div>
+          <div id="halleffect">
+            <canvas id="hefChart" height="400px"></canvas>
+          </div>
+        </div>
+        <div id="chartGroup2" class="sensorDataLarge data-container" >
+          <div id="ultrasonic">
+            <canvas id="uscChart" height="325px"></canvas>
+          </div>
+          <div id="imu">
+            <canvas id="imuChart" height="600px"></canvas>
+          </div>
+        </div>
+        <div id="chartGroup3" class="sensorDataSmall data-container">
+          <div id="temperature">
+            <canvas id="tmpChart" height="400px"></canvas>
+          </div>
+          <div id="humidity">
+            <canvas id="hmdChart" height="400px"></canvas>
+          </div>
+        </div>
+      </div>
+      
       <div id="joystick-padding"></div>
-    </div> <!-- END row -->
+     <!-- END row -->
   </div> <!-- END page Container -->
 
   <footer class="footer" id="vehicle_footer">
