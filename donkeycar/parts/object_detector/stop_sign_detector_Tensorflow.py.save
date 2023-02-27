@@ -29,7 +29,6 @@ from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import LabelBinarizer
 import time
 import PIL
-import tflite_runtime.interpreter as tflite
 # Patch the location of gfile
 tf.gfile = tf.io.gfile
 
@@ -78,8 +77,8 @@ class StopSignDetector(object):
         self.reverse_count = max_reverse_count
         self.reverse_throttle = reverse_throttle
         self.is_reversing = False
-        self.output = None
-        self.input = None
+
+
         self.model = None
     
     def build_model(self):
@@ -111,21 +110,7 @@ class StopSignDetector(object):
 
         model.compile(loss = tf.keras.losses.categorical_crossentropy)
         model.load_weights("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/model_bbox_regression_and_classification_weights")
-        model.save("model.h5")
-        converter = tf.lite.TFLiteConverter.from_keras_model_file("model.h5")
-        # converter.optimizations = [tf.lite.Optimize.DEFAULT]
-        # converter.target_spec.supported_types = [tf.float16]
-        tf_lite_model = converter.convert()
-        with open("model.tflite","wb") as file:
-            file.write(tf_lite_model)
-        interperter = tf.lite.Interpreter(model_path = "model.tflite")
-        interperter.allocate_tensors()
-        input = interperter.get_input_details()[0]["index"]
-        output = interperter.get_output_details()[0]["index"]
-        self.input = input
-        self.output = output
-        self.model = interperter
-        print("Built model!")
+        self.model = model
 
 
     # Download and extract model
@@ -167,7 +152,7 @@ class StopSignDetector(object):
         Returns:
         uint8 numpy array with shape (img_height, img_width, 3)
         """
-        return np.asarray(img)
+        return np.array(img)
 
     '''
     Return an object if there is a traffic light in the frame
@@ -181,22 +166,15 @@ class StopSignDetector(object):
         except:
             time.sleep(0.1)
             self.detect_stop_sign()
-        try:
-            image_np = (np.array(img_arr)) / 255.0 
-        except:
-            image_np = (np.array(img_arr)) / 255.0 
-        #print("Loaded Image")
-        image_np = np.expand_dims(image_np, axis=0).astype(np.float32)
-        #print("Converted to Numpy")
-        #print("input - {}".format(self.model.get_input_details()))
-        self.model.set_tensor(self.input,image_np)
-        #print("Set Tensor")
-        labelPreds = self.model.get_tensor(self.output)
-        #print("Got Tensor")
+	try:
+
+	        image_np = self.load_image_into_numpy_array(img_arr) / 255.0
+        
+image_np = np.expand_dims(image_np, axis=0)
+        labelPreds = self.model.predict(image_np)
         # finding class label with highest pred. probability
         i = np.argmax(labelPreds, axis=1)
         label = self.lb.classes_[i][0]
-        print(label)
         traffic_light_obj = label == "stop"
         value = None
         if traffic_light_obj or self.is_reversing:

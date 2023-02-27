@@ -207,7 +207,7 @@ class Webcam(BaseCamera):
         # minimum number of votes (intersections in Hough grid cell)
         threshold = 20
 
-        min_line_length = 90  # minimum number of pixels making up a line
+        min_line_length = 70  # minimum number of pixels making up a line
 
         max_line_gap = 1  # maximum gap in pixels between connectable line segments
 

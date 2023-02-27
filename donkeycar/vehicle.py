@@ -23,12 +23,23 @@ logger = logging.getLogger(__name__)
 class PartProfiler:
     def __init__(self):
         self.records = {}
+        self.fps = []
+        self.old_time = time.time()
 
-    def profile_part(self, p):
+    def profile_fps(self):
+        newTime = time.time()
+        processTime = newTime - self.old_time
+        fps = 1.0 / processTime
+        self.fps.append(fps)
+        self.old_time = newTime
+
+    def profile_part(self, p,threaded = False):
         self.records[p] = { "times" : [] }
+        self.records[p]['threaded'] = threaded
 
     def on_part_start(self, p):
         self.records[p]['times'].append(time.time())
+        
 
     def on_part_finished(self, p):
         now = time.time()
@@ -42,7 +53,7 @@ class PartProfiler:
     def report(self):
         logger.info("Part Profile Summary: (times in ms)")
         pt = PrettyTable()
-        field_names = ["part", "max", "min", "avg"]
+        field_names = ["part","threaded", "max", "min", "avg"]
         pctile = [50, 90, 99, 99.9]
         pt.field_names = field_names + [str(p) + '%' for p in pctile]
         for p, val in self.records.items():
@@ -52,12 +63,20 @@ class PartProfiler:
             arr = val['times'][1:-1]
             if len(arr) == 0:
                 continue
+            threaded = val['threaded']
             row = [p.__class__.__name__,
+                   f"{threaded}",
                    "%.2f" % (max(arr) * 1000),
                    "%.2f" % (min(arr) * 1000),
                    "%.2f" % (sum(arr) / len(arr) * 1000)]
             row += ["%.2f" % (np.percentile(arr, p) * 1000) for p in pctile]
             pt.add_row(row)
+        arr = self.fps
+        row = ["FPS","False","%.2f" % (max(arr)),
+                   "%.2f" % (min(arr)),
+                   "%.2f" % (sum(arr) / len(arr))]
+        row += ["%.2f" % (np.percentile(arr, p)) for p in pctile]
+        pt.add_row(row)
         logger.info('\n' + str(pt))
 
 
@@ -72,6 +91,7 @@ class Vehicle:
         self.threads = []
         self.profiler = PartProfiler()
         self.cfg = donkeycar.load_config()
+        self.STOP_SIGN_DETECTOR = self.cfg.STOP_SIGN_DETECTOR
 
     def add(self, part, inputs=[], outputs=[],
             threaded=False, run_condition=None):
@@ -96,6 +116,7 @@ class Vehicle:
         assert type(threaded) is bool, "threaded is not a boolean: %r" % threaded
 
         p = part
+        
         logger.info('Adding part {}.'.format(p.__class__.__name__))
         entry = {}
         entry['part'] = p
@@ -109,7 +130,7 @@ class Vehicle:
             entry['thread'] = t
 
         self.parts.append(entry)
-        self.profiler.profile_part(part)
+        self.profiler.profile_part(part,threaded)
 
     def remove(self, part):
         """
@@ -197,14 +218,18 @@ class Vehicle:
                 p = entry['part']
                 # start timing part run
                 self.profiler.on_part_start(p)
-                if (self.cfg.STOP_SIGN_DETECTOR and type(p)== donkeycar.parts.object_detector.stop_sign_detector_Tensorflow.StopSignDetector):
+                if (self.STOP_SIGN_DETECTOR and type(p)== donkeycar.parts.object_detector.stop_sign_detector_Tensorflow.StopSignDetector):
                     if os.path.exists("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/stop.pickle"):
+                        print("Found Stop Sign")
                         with open('/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/stop.pickle',"rb") as file:
                             outputs = pickle.load(file)
                             self.mem.put(entry['outputs'], outputs)
                     img = self.mem.get_old_image() 
+                    # img = np.array(img)
+                    # np.save("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/img.npy",img)
+
                     im = PIL.Image.fromarray(img)
-                    im.save("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/img.jpg")
+                    im.save("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/img.jpg",quality=50)
                 else:
                     # get inputs from memory
                     inputs = self.mem.get(entry['inputs'])
@@ -222,6 +247,7 @@ class Vehicle:
                         self.mem.add_old_image(img)
                     # finish timing part run
                 self.profiler.on_part_finished(p)
+                self.profiler.profile_fps()
 
     def stop(self):        
         logger.info('Shutting down vehicle and its parts...')

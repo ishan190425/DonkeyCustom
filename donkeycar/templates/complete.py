@@ -420,8 +420,8 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None,
                 inputs=['pilot/throttle'],
                 outputs=['pilot/throttle'])
         else:
-            from donkeycar.parts.object_detector.stop_sign_detector_Tensorflow \
-                import StopSignDetector
+            # from donkeycar.parts.object_detector.stop_sign_detector_Tensorflow \
+            #     import StopSignDetector
             if os.path.exists("~/projects/DonkeyCustom/donkeycar/parts/object_detector/img.jpg"):
                 print("Image Deleted====================")
                 os.remove("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/img.jpg")
@@ -431,13 +431,13 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None,
                 print("Stop Pickle Deleted")
                 os.remove("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/stop.pickle")
 
-            V.add(StopSignDetector(
-                                cfg.STOP_SIGN_SHOW_BOUNDING_BOX,
-                                cfg.STOP_SIGN_MAX_REVERSE_COUNT,
-                                cfg.STOP_SIGN_REVERSE_THROTTLE,
-                                cfg.STOP_SIGN_MODEL),
-                inputs=['cam/image_array', 'pilot/throttle'],
-                outputs=['pilot/throttle', 'cam/image_array'])
+            # V.add(StopSignDetector(
+            #                     cfg.STOP_SIGN_SHOW_BOUNDING_BOX,
+            #                     cfg.STOP_SIGN_MAX_REVERSE_COUNT,
+            #                     cfg.STOP_SIGN_REVERSE_THROTTLE,
+            #                     cfg.STOP_SIGN_MODEL),
+            #     inputs=['cam/image_array', 'pilot/throttle'],
+            #     outputs=['pilot/throttle', 'cam/image_array'])
             
             V.add(ThrottleFilter(), 
                 inputs=['pilot/throttle'],
