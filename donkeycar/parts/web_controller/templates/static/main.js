@@ -21,6 +21,7 @@ var driveHandler = new function() {
         'controlMode': 'joystick',
         'maxThrottle' : 1,
         'throttleMode' : 'user',
+        'graph' : 'battery',
         'buttons': {
             "w1": false,  // boolean; true is 'down' or pushed, false is 'up' or not pushed
             "w2": false,
@@ -47,6 +48,7 @@ var driveHandler = new function() {
       socket = new WebSocket('ws://' + location.host + '/wsDrive');
 
       setBindings()
+      updateUI();
 
       joystick_element = document.getElementById('joystick_container');
       joystick_options = {
@@ -120,6 +122,7 @@ var driveHandler = new function() {
             updateUI();
         }
       };
+      updateUI();
 
       $(document).keydown(function(e) {
           if(e.which == 32) { toggleBrake() }  // 'space'  brake
@@ -138,12 +141,19 @@ var driveHandler = new function() {
         updateDriveMode($(this).val());
       });
 
-      $('#max_throttle_select').on('change', function () {
-        state.maxThrottle = parseFloat($(this).val());
+      $('#speedRange').on('change', function () {
+        state.maxThrottle = parseFloat(output.value);
+        console.log(state.maxThrottle);
       });
 
       $('#throttle_mode_select').on('change', function () {
         state.throttleMode = $(this).val();
+      });
+
+      $('#chart-select').on('change', function () {
+        state.graph = $(this).val();
+        updateUI();
+        console.log(state.graph);
       });
 
       $('#record_button').click(function () {
@@ -260,12 +270,12 @@ var driveHandler = new function() {
 
       if (state.recording) {
         $('#record_button')
-          .html('Stop Recording (r)')
+          .html('Stop Recording')
           .removeClass('btn-info')
           .addClass('btn-warning').end()
       } else {
         $('#record_button')
-          .html('Start Recording (r)')
+          .html('Start Recording')
           .removeClass('btn-warning')
           .addClass('btn-info').end()
       }
@@ -315,6 +325,56 @@ var driveHandler = new function() {
         $('#tilt-toggle').removeClass("active");
         $('#tilt').removeAttr("checked")
       }
+      
+      if(state.graph == "battery"){
+        $('#batChart').show();
+        $('#hefChart').hide();
+        $('#chartGroup1').show();
+
+      }
+      else if(state.graph == "halleffect"){
+        $('#hefChart').show();
+        $('#batChart').hide();        
+        $('#chartGroup1').show();
+      }
+      else{
+        $('#hefChart').hide();
+        $('#batChart').hide();
+        $('#chartGroup1').hide();
+      }
+      if(state.graph == "ultrasonic"){
+        $('#uscChart').show();
+        $('#imuChart').hide();
+        $('#chartGroup2').show();
+
+      }
+      else if(state.graph == "imu"){
+        $('#imuChart').show();
+        $('#uscChart').hide();        
+        $('#chartGroup2').show();
+      }
+      else{
+        $('#imuChart').hide();
+        $('#uscChart').hide();
+        $('#chartGroup2').hide();
+      }
+      if(state.graph == "temperature"){
+        $('#tmpChart').show();
+        $('#hmdChart').hide();
+        $('#chartGroup3').show();
+
+      }
+      else if(state.graph == "humidity"){
+        $('#hmdChart').show();
+        $('#tmpChart').hide();        
+        $('#chartGroup3').show();
+      }
+      else{
+        $('#hmdChart').hide();
+        $('#tmpChart').hide();
+        $('#chartGroup3').hide();
+      }
+    
 
       //drawLine(state.tele.user.angle, state.tele.user.throttle)
     };

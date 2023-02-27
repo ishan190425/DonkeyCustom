@@ -3,42 +3,35 @@ import os
 import time
 import numpy as np
 from PIL import Image
-import pygame.image
 import glob
-import cv2
 from donkeycar.utils import rgb2gray
-import random
-import donkeycar as dk
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-
 class CameraError(Exception):
     pass
-
 
 class BaseCamera:
 
     def run_threaded(self):
         return self.frame
 
-
 class PiCamera(BaseCamera):
     def __init__(self, image_w=160, image_h=120, image_d=3, framerate=20, vflip=False, hflip=False):
         from picamera.array import PiRGBArray
         from picamera import PiCamera
-        
+
         resolution = (image_w, image_h)
         # initialize the camera and stream
-        self.camera = PiCamera()  # PiCamera gets resolution (height, width)
+        self.camera = PiCamera() #PiCamera gets resolution (height, width)
         self.camera.resolution = resolution
         self.camera.framerate = framerate
         self.camera.vflip = vflip
         self.camera.hflip = hflip
         self.rawCapture = PiRGBArray(self.camera, size=resolution)
         self.stream = self.camera.capture_continuous(self.rawCapture,
-                                                     format="rgb", use_video_port=True)
+            format="rgb", use_video_port=True)
 
         # initialize the frame and the variable used to indicate
         # if the thread should be stopped
@@ -94,7 +87,7 @@ class PiCamera(BaseCamera):
 
 
 class Webcam(BaseCamera):
-    def __init__(self, image_w=160, image_h=120, image_d=3, framerate=20, camera_index=0):
+    def __init__(self, image_w=160, image_h=120, image_d=3, framerate = 20, camera_index = 0):
         #
         # pygame is not installed by default.
         # Installation on RaspberryPi (with env activated):
@@ -103,8 +96,6 @@ class Webcam(BaseCamera):
         # pip install pygame
         #
         super().__init__()
-        self.cfg = dk.load_config()
-        self.pre_processing = self.cfg.PRE_PROCESSING 
         self.cam = None
         self.framerate = framerate
 
@@ -142,11 +133,9 @@ class Webcam(BaseCamera):
 
             logger.info(f'Available cameras {l}')
             if camera_index < 0 or camera_index >= len(l):
-                raise CameraError(
-                    f"The 'CAMERA_INDEX={camera_index}' configuration in myconfig.py is out of range.")
+                raise CameraError(f"The 'CAMERA_INDEX={camera_index}' configuration in myconfig.py is out of range.")
 
-            self.cam = pygame.camera.Camera(
-                l[camera_index], self.resolution, "RGB")
+            self.cam = pygame.camera.Camera(l[camera_index], self.resolution, "RGB")
             self.cam.start()
 
             logger.info(f'Webcam opened at {l[camera_index]} ...')
@@ -158,109 +147,30 @@ class Webcam(BaseCamera):
 
             if self.frame is None:
                 raise CameraError("Unable to start Webcam.\n"
-                                  "If more than one camera is available then"
-                                  " make sure your 'CAMERA_INDEX' is correct in myconfig.py")
+                                   "If more than one camera is available then"
+                                   " make sure your 'CAMERA_INDEX' is correct in myconfig.py")
 
         except CameraError:
             raise
         except Exception as e:
             raise CameraError("Unable to open Webcam.\n"
-                              "If more than one camera is available then"
-                              " make sure your 'CAMERA_INDEX' is correct in myconfig.py") from e
+                               "If more than one camera is available then"
+                               " make sure your 'CAMERA_INDEX' is correct in myconfig.py") from e
         logger.info("Webcam ready.")
 
-    def greyscale(self, surface):
-
-        #arr = pygame.surfarray.pixels3d(surface)
-        arr = surface
-        mean_arr = np.dot(arr[:, :, :], [0.216, 0.587, 0.144])
-        mean_arr3d = mean_arr[..., np.newaxis]
-        new_arr = np.repeat(mean_arr3d[:, :, :], 3, axis=2)
-        new_arr = self.identify_table_lines(new_arr)
-        #self.show_image(thresh,"Threshold - 2")
-        return new_arr
-
-    def noise(self, image):
-        noise_factor = 0.8
-        mask = image == 0
-        c = np.count_nonzero(mask)
-        threshold_prob = noise_factor * 100
-        nums = np.random.randint(1, 100, c)
-        vals = np.where(nums <= threshold_prob, np.random.randint(1, 6, c), 0)
-        image[mask] = vals
-
-    def identify_table_lines(self, image):
-
-        # Apply Gaussian blur to smooth the image and reduce noise
-        blur = cv2.GaussianBlur(image, (5, 5), 0)
-        blur = blur.astype(np.uint8)
-        #print(blur)
-        # Apply Canny edge detection to find the edges in the image
-        edges = cv2.Canny(blur, 50, 150)
-        #self.show_image(edges,"Edges")
-
-        rho = 10  # distance resolution in pixels of the Hough grid
-
-        theta = np.pi / 180  # angular resolution in radians of the Hough grid
-
-        # minimum number of votes (intersections in Hough grid cell)
-        threshold = 20
-
-        min_line_length = 90  # minimum number of pixels making up a line
-
-        max_line_gap = 1  # maximum gap in pixels between connectable line segments
-
-        line_image = np.copy(edges) * 0  # creating a blank to draw lines on
-
-        # Run Hough on edge detected image
-        # Find the lines in the image using Hough line transformation
-        lines = cv2.HoughLinesP(edges, rho, theta, threshold, np.array([]),
-                                min_line_length, max_line_gap)
-
-        # Extract the rows and columns of the table
-        #rows, cols = self.extract_rows_and_cols(lines,line_image,image)
-
-        lines_edges = cv2.addWeighted(edges, 0.8, line_image, 1, 0)
-        self.noise(lines_edges)
-
-        #self.show_image(lines_edges,"Lines")
-
-        return lines_edges
-
     def run(self):
-
+        import pygame.image
         if self.cam.query_image():
             snapshot = self.cam.get_image()
             if snapshot is not None:
                 snapshot1 = pygame.transform.scale(snapshot, self.resolution)
-                self.old_frame = pygame.surfarray.pixels3d(pygame.transform.rotate(
-                    pygame.transform.flip(snapshot1, True, False), 90))
-                #print("old: {}".format(self.frame.shape))
-                if self.pre_processing:
-                    self.old_frame = self.greyscale(self.old_frame)
-                    h, w = self.old_frame.shape
-                    #print(h,w)
-                    # mask = np.zeros((h,w),dtype=np.uint8)
-                    # self.noise(mask)
-                    # points = np.array([[[0,120],[0, 80], [40,60],[120,60],[160, 80], [160,120]]])
-                    # cv2.fillPoly(mask,points,(255))
-                    # self.old_frame = cv2.bitwise_and(self.old_frame,self.old_frame,mask = mask)
-
-                    #self.old_frame[:(1*len(self.old_frame))//2] = 0
-                    #self.frame = np.reshape(self.frame.shape[0],self.frame.shape[1],3)
-                    #h,w = self.old_frame.shape
-                    color_img = np.zeros([h, w, 3])
-                    color_img[:, :, 1] = self.old_frame
-                    self.frame = color_img
-                else:
-                    self.frame = self.old_frame
-                #print("new: {}".format(self.frame.shape))
+                self.frame = pygame.surfarray.pixels3d(pygame.transform.rotate(pygame.transform.flip(snapshot1, True, False), 90))
                 if self.image_d == 1:
                     self.frame = rgb2gray(frame)
 
         return self.frame
 
-    def update(self):
+    def update(self):	
         from datetime import datetime, timedelta
         while self.on:
             start = datetime.now()
@@ -269,6 +179,7 @@ class Webcam(BaseCamera):
             s = 1 / self.framerate - (stop - start).total_seconds()
             if s > 0:
                 time.sleep(s)
+
 
     def run_threaded(self):
         return self.frame
@@ -289,11 +200,10 @@ class CSICamera(BaseCamera):
     Credit: https://github.com/feicccccccc/donkeycar/blob/dev/donkeycar/parts/camera.py
     gstreamer init string from https://github.com/NVIDIA-AI-IOT/jetbot/blob/master/jetbot/camera.py
     '''
-
-    def gstreamer_pipeline(self, capture_width=3280, capture_height=2464, output_width=224, output_height=224, framerate=21, flip_method=0):
+    def gstreamer_pipeline(self, capture_width=3280, capture_height=2464, output_width=224, output_height=224, framerate=21, flip_method=0) :   
         return 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=%d, height=%d, format=(string)NV12, framerate=(fraction)%d/1 ! nvvidconv flip-method=%d ! nvvidconv ! video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! videoconvert ! appsink' % (
-            capture_width, capture_height, framerate, flip_method, output_width, output_height)
-
+                capture_width, capture_height, framerate, flip_method, output_width, output_height)
+    
     def __init__(self, image_w=160, image_h=120, image_d=3, capture_width=3280, capture_height=2464, framerate=60, gstreamer_flip=0):
         '''
         gstreamer_flip = 0 - no flip
@@ -345,7 +255,7 @@ class CSICamera(BaseCamera):
 
     def poll_camera(self):
         import cv2
-        self.ret, frame = self.camera.read()
+        self.ret , frame = self.camera.read()
         if frame is not None:
             self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -355,7 +265,7 @@ class CSICamera(BaseCamera):
 
     def run_threaded(self):
         return self.frame
-
+    
     def shutdown(self):
         self.running = False
         logger.info('Stopping CSICamera')
@@ -371,7 +281,6 @@ class V4LCamera(BaseCamera):
     python setup.py build
     pip install -e .
     '''
-
     def __init__(self, image_w=160, image_h=120, image_d=3, framerate=20, dev_fn="/dev/video0", fourcc='MJPG'):
 
         self.running = True
@@ -388,11 +297,9 @@ class V4LCamera(BaseCamera):
 
         # Suggest an image size to the device. The device may choose and
         # return another size if it doesn't support the suggested one.
-        self.size_x, self.size_y = self.video.set_format(
-            self.image_w, self.image_h, fourcc=self.fourcc)
+        self.size_x, self.size_y = self.video.set_format(self.image_w, self.image_h, fourcc=self.fourcc)
 
-        logger.info("V4L camera granted %d, %d resolution." %
-                    (self.size_x, self.size_y))
+        logger.info("V4L camera granted %d, %d resolution." % (self.size_x, self.size_y))
 
         # Create a buffer to store image data in. This must be done before
         # calling 'start' if v4l2capture is compiled with libv4l2. Otherwise
@@ -428,7 +335,6 @@ class MockCamera(BaseCamera):
     '''
     Fake camera. Returns only a single static frame
     '''
-
     def __init__(self, image_w=160, image_h=120, image_d=3, image=None):
         if image is not None:
             self.frame = image
@@ -446,11 +352,9 @@ class ImageListCamera(BaseCamera):
     '''
     Use the images from a tub as a fake camera output
     '''
-
     def __init__(self, path_mask='~/mycar/data/**/images/*.jpg'):
-        self.image_filenames = glob.glob(
-            os.path.expanduser(path_mask), recursive=True)
-
+        self.image_filenames = glob.glob(os.path.expanduser(path_mask), recursive=True)
+    
         def get_image_index(fnm):
             sl = os.path.basename(fnm).split('_')
             return int(sl[0])
@@ -465,7 +369,7 @@ class ImageListCamera(BaseCamera):
         #self.image_filenames.sort(key=os.path.getmtime)
         self.num_images = len(self.image_filenames)
         logger.info('%d images loaded.' % self.num_images)
-        logger.info(self.image_filenames[:10])
+        logger.info( self.image_filenames[:10])
         self.i_frame = 0
         self.frame = None
         self.update()
@@ -473,10 +377,10 @@ class ImageListCamera(BaseCamera):
     def update(self):
         pass
 
-    def run_threaded(self):
+    def run_threaded(self):        
         if self.num_images > 0:
             self.i_frame = (self.i_frame + 1) % self.num_images
-            self.frame = Image.open(self.image_filenames[self.i_frame])
+            self.frame = Image.open(self.image_filenames[self.i_frame]) 
 
         return np.asarray(self.frame)
 
