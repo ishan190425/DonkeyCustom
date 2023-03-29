@@ -1,12 +1,17 @@
 #!/bin/bash
-sudo apt-get install -y pv
-# Step 1: Install Python 3.7
-echo "Installing Python 3.7..."
-sudo apt-get update | pv -t
-sudo apt-get install -y software-properties-common | pv -t
-sudo add-apt-repository ppa:deadsnakes/ppa | pv -t
-sudo apt-get update | pv -t
-sudo apt-get install -y python3.7 | pv -t
+
+sudo apt-get install -y pv 
+# Step 2: Download and Install Python 3.7
+cd /tmp
+wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tar.xz
+tar xf Python-3.7.0.tar.xz
+cd Python-3.7.0
+./configure --enable-optimizations
+make -j4
+sudo make altinstall
+
+cd ..
+sudo rm -rf Python-3.7.0.tar.xz Python-3.7.0
 
 # Step 2: Switch to Python 3.7
 echo "Switching to Python 3.7..."
