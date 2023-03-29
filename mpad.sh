@@ -1,5 +1,5 @@
 #!/bin/bash
-
+sudo apt-get install -t pv
 # Step 1: Install Python 3.7
 echo "Installing Python 3.7..."
 sudo apt-get update | pv -t
