@@ -24,9 +24,9 @@ cd projects
 git clone https://github.com/ishan190425/DonkeyCustom
 cd DonkeyCustom
 git checkout main
-pip install -e .
-pip install -r mpad.txt
-pip install https://github.com/lhelontra/tensorflow-on-arm/releases/download/v2.2.0/tensorflow-2.2.0-cp37-none-linux_armv7l.whl
+pip install -y -e .[pi]
+pip install -y -r mpad.txt
+pip install -y https://github.com/lhelontra/tensorflow-on-arm/releases/download/v2.2.0/tensorflow-2.2.0-cp37-none-linux_armv7l.whl
 
 # Step 12: (Optional) Install OpenCV
 sudo apt install -y python3-opencv
