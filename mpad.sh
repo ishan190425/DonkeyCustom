@@ -3,12 +3,12 @@
 sudo apt-get install -y pv 
 # Step 2: Download and Install Python 3.7
 cd /tmp
-wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tar.xz
-tar xf Python-3.7.0.tar.xz
+wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tar.xz | pv -t
+tar xf Python-3.7.0.tar.xz | pv -t
 cd Python-3.7.0
-./configure --enable-optimizations
-make -j4
-sudo make altinstall
+./configure --enable-optimizations | pv -t
+make -j4 | pv -t
+sudo make altinstall | pv -t
 
 cd ..
 sudo rm -rf Python-3.7.0.tar.xz Python-3.7.0
