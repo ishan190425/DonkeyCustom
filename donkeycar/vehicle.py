@@ -17,6 +17,7 @@ import donkeycar
 import os
 import PIL
 import pickle
+import RPi.GPIO as GPIO
 logger = logging.getLogger(__name__)
 
 
@@ -92,6 +93,9 @@ class Vehicle:
         self.profiler = PartProfiler()
         self.cfg = donkeycar.load_config()
         self.STOP_SIGN_DETECTOR = self.cfg.STOP_SIGN_DETECTOR
+        self.pin = 17
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.pin,GPIO.IN)
 
     def add(self, part, inputs=[], outputs=[],
             threaded=False, run_condition=None):
@@ -219,17 +223,9 @@ class Vehicle:
                 # start timing part run
                 self.profiler.on_part_start(p)
                 if (self.STOP_SIGN_DETECTOR and type(p)== donkeycar.parts.object_detector.stop_sign_detector_Tensorflow.StopSignDetector):
-                    if os.path.exists("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/stop.pickle"):
+                    if GPIO.input(self.pin):
                         print("Found Stop Sign")
-                        with open('/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/stop.pickle',"rb") as file:
-                            outputs = pickle.load(file)
-                            self.mem.put(entry['outputs'], outputs)
-                    img = self.mem.get_old_image() 
-                    # img = np.array(img)
-                    # np.save("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/img.npy",img)
-
-                    im = PIL.Image.fromarray(img)
-                    im.save("/home/pi/projects/DonkeyCustom/donkeycar/parts/object_detector/img.jpg",quality=50)
+                        self.mem.put(entry['outputs'], [0,0])
                 else:
                     # get inputs from memory
                     inputs = self.mem.get(entry['inputs'])
@@ -247,7 +243,8 @@ class Vehicle:
                         self.mem.add_old_image(img)
                     # finish timing part run
                 self.profiler.on_part_finished(p)
-                self.profiler.profile_fps()
+                if type(p) == donkeycar.parts.camera.Webcam:
+                    self.profiler.profile_fps()
 
     def stop(self):        
         logger.info('Shutting down vehicle and its parts...')
