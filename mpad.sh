@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Step 6: Update and Upgrade
-sudo apt-get update --allow-releaseinfo-change
-sudo apt-get upgrade
+sudo apt-get update -y --allow-releaseinfo-change
+sudo apt-get upgrade -y
 
 # Step 7: Raspi-config
 echo "Please follow the instructions in Step 7 to update the Raspberry Pi settings manually."
