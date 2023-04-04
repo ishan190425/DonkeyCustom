@@ -43,6 +43,7 @@ class PiCamera(BaseCamera):
         # initialize the frame and the variable used to indicate
         # if the thread should be stopped
         self.frame = None
+        self.old_image = None
         self.on = True
         self.image_d = image_d
 
@@ -107,7 +108,7 @@ class Webcam(BaseCamera):
         self.pre_processing = self.cfg.PRE_PROCESSING 
         self.cam = None
         self.framerate = framerate
-
+        self.old_image = None
         # initialize variable used to indicate
         # if the thread should be stopped
         self.frame = None
@@ -206,7 +207,7 @@ class Webcam(BaseCamera):
         # minimum number of votes (intersections in Hough grid cell)
         threshold = 20
 
-        min_line_length = 90  # minimum number of pixels making up a line
+        min_line_length = 70  # minimum number of pixels making up a line
 
         max_line_gap = 1  # maximum gap in pixels between connectable line segments
 
@@ -237,6 +238,7 @@ class Webcam(BaseCamera):
                     pygame.transform.flip(snapshot1, True, False), 90))
                 #print("old: {}".format(self.frame.shape))
                 if self.pre_processing:
+                    self.old_image = self.old_frame
                     self.old_frame = self.greyscale(self.old_frame)
                     h, w = self.old_frame.shape
                     #print(h,w)
@@ -254,12 +256,15 @@ class Webcam(BaseCamera):
                     self.frame = color_img
                 else:
                     self.frame = self.old_frame
+                    self.old_image = self.old_frame
                 #print("new: {}".format(self.frame.shape))
                 if self.image_d == 1:
                     self.frame = rgb2gray(frame)
 
         return self.frame
 
+    def get_old_image(self):
+        return self.old_image
     def update(self):
         from datetime import datetime, timedelta
         while self.on:

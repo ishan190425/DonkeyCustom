@@ -12,6 +12,7 @@ class Memory:
     """
     def __init__(self, *args, **kw):
         self.d = {}
+        self.old_image = None
     
     def __setitem__(self, key, value):
         if type(key) is str:
@@ -40,6 +41,8 @@ class Memory:
                 except IndexError as e:
                     error = str(e) + ' issue with keys: ' + str(key)
                     raise IndexError(error)
+                except TypeError as t:
+                    error = str(t) + ' issue with type: ' + str(type(inputs))
         
         else:
             self.d[keys[0]] = inputs
@@ -58,4 +61,8 @@ class Memory:
     
     def items(self):
         return self.d.items()
-        
+    
+    def add_old_image(self,image):
+        self.old_image = image
+    def get_old_image(self):
+        return self.old_image
