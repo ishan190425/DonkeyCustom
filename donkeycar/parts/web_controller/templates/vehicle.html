@@ -278,11 +278,7 @@
               </script>
             </canvas>
           </div>
-<<<<<<< HEAD
           <!-- <div id="imu">
-=======
-          <div id="imu">
->>>>>>> 1851d25bf1be167f703242e07cd708a0c158bc32
             <canvas id="imuChart" height="400px">
               <script>
                 var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
@@ -350,8 +346,7 @@
               };
               setInterval(checkForChangesimu,1000)
               </script>
-<<<<<<< HEAD
-            </canvas> 
+            </canvas>
           </div> -->
         </div>
         <div id="chartGroup3" class="sensorDataSmall data-container">
@@ -423,10 +418,31 @@
               };
               setInterval(checkForChangesimu,1000)
               </script>
-=======
->>>>>>> 1851d25bf1be167f703242e07cd708a0c158bc32
             </canvas>
           </div>
+          <!-- <div id="temperature">
+            <canvas id="tmpChart" height="400px">
+              <script>
+                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+                new Chart("tmpChart", {
+                  type: "line", 
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      borderColor: "green",
+                      data: [2, 2, 5, 4, 8, 4, 7, 6, 3, 1, 0, 6, 7, 8, 9, 14, 13, 12, 11, 10],
+                      fill: false
+                    }]
+                  },
+                options:{
+                  legend: {display: false},
+                  scales: {yAxes: [{ticks: {min: 0, max: 16}}],
+                }
+              }
+            });
+              </script>
+            </canvas>
+          </div> -->
           <!-- <div id="humidity">
             <canvas id="hmdChart" height="400px">
               <script>
@@ -451,57 +467,6 @@
             </canvas>
           </div> -->
         </div>
-<<<<<<< HEAD
-=======
-        <div id="chartGroup3" class="sensorDataSmall data-container">
-          <div id="temperature">
-            <canvas id="tmpChart" height="400px">
-              <script>
-                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
-                new Chart("tmpChart", {
-                  type: "line", 
-                  data: {
-                    labels: xValues,
-                    datasets: [{
-                      borderColor: "green",
-                      data: [2, 2, 5, 4, 8, 4, 7, 6, 3, 1, 0, 6, 7, 8, 9, 14, 13, 12, 11, 10],
-                      fill: false
-                    }]
-                  },
-                options:{
-                  legend: {display: false},
-                  scales: {yAxes: [{ticks: {min: 0, max: 16}}],
-                }
-              }
-            });
-              </script>
-            </canvas>
-          </div>
-          <div id="humidity">
-            <canvas id="hmdChart" height="400px">
-              <script>
-                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
-                new Chart("hmdChart", {
-                  type: "line", 
-                  data: {
-                    labels: xValues,
-                    datasets: [{
-                      borderColor: "black",
-                      data: [11, 12, 13, 14, 15, 14, 12, 10, 9, 10, 7, 12, 11, 9, 7, 5, 3, 1, 1, 0],
-                      fill: false
-                    }]
-                  },
-                options:{
-                  legend: {display: false},
-                  scales: {yAxes: [{ticks: {min: 0, max: 16}}],
-                }
-              }
-            });
-              </script>
-            </canvas>
-          </div>
-        </div>
->>>>>>> 1851d25bf1be167f703242e07cd708a0c158bc32
       </div>
       
       <div id="joystick-padding"></div>

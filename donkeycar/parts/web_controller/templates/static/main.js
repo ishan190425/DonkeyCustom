@@ -326,55 +326,30 @@ var driveHandler = new function() {
         $('#tilt-toggle').removeClass("active");
         $('#tilt').removeAttr("checked")
       }
-<<<<<<< HEAD
       if(state.graph == "tfluna"){
+        $('#tflChart').show();   
         $('#uscChart').hide();
         $('#imuChart').hide();
-        $('#tflChart').show();        
         $('#chartGroup1').show();
       }
       else if(state.graph == "ultrasonic"){
         $('#uscChart').show();
         $('#imuChart').hide();
-        $('#tflChart').hide();        
-=======
-      if(state.graph == "halleffect"){
-        $('#tflChart').show();        
-        $('#chartGroup1').show();
-      }
-      else{
-        $('#tflChart').hide();
-        $('#chartGroup1').hide();
-      }
-      if(state.graph == "ultrasonic"){
-        $('#uscChart').show();
-        $('#imuChart').hide();
->>>>>>> 1851d25bf1be167f703242e07cd708a0c158bc32
+        $('#tflChart').hide(); 
         $('#chartGroup2').show();
 
       }
       else if(state.graph == "imu"){
-<<<<<<< HEAD
-        $('#uscChart').hide();
         $('#imuChart').show();
-        $('#tflChart').hide();        
+        $('#uscChart').hide();     
+        $('#tflChart').hide();    
         $('#chartGroup3').show();
       }
       else{
-        $('#uscChart').hide();
         $('#imuChart').hide();
-        $('#tflChart').hide();        
+        $('#uscChart').hide();
+        $('#tflChart').hide(); 
         
-=======
-        $('#imuChart').show();
-        $('#uscChart').hide();        
-        $('#chartGroup2').show();
-      }
-      else{
-        $('#imuChart').hide();
-        $('#uscChart').hide();
-        $('#chartGroup2').hide();
->>>>>>> 1851d25bf1be167f703242e07cd708a0c158bc32
       }
          
 
