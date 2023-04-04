@@ -1024,6 +1024,11 @@ def add_drivetrain(V, cfg):
                         )
             V.add(vesc, inputs=['angle', 'throttle'])
 
+        elif cfg.SENSORS:
+            from donkeycar.parts.sensor import Sensor
+            sensor = Sensor()
+            V.add(sensor, inputs=['angle', 'throttle'])
+
 
 if __name__ == '__main__':
     args = docopt(__doc__)
