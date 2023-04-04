@@ -278,6 +278,83 @@
               </script>
             </canvas>
           </div>
+<<<<<<< HEAD
+          <!-- <div id="imu">
+=======
+          <div id="imu">
+>>>>>>> 1851d25bf1be167f703242e07cd708a0c158bc32
+            <canvas id="imuChart" height="400px">
+              <script>
+                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+                var imuChart = new Chart("imuChart", {
+                  type: "line", 
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      borderColor: "black",
+                      data: [],
+                      fill: false
+                    },
+                    {
+                      borderColor: "red",
+                      data: [],
+                      fill: false
+                    },
+                    {
+                      borderColor: "black",
+                      data: [],
+                      fill: false
+                    }]
+                  },
+                options:{
+                  legend: {display: false},
+                  scales: {yAxes: [{ticks: {min: 0, max: 50}}],
+                }
+              }
+            });
+            function imuChartUpdate(data){
+              
+              var datasets = imuChart.data.datasets;
+              console.log(datasets[0]);
+              if(datasets[0].data.length === 20){
+                datasets[0].data.shift();
+              }
+              datasets[0].data.push(Number(data[0]));
+              imuChart.datasets = datasets;
+              imuChart.update();
+            }
+            var lastSeen = []
+            function checkForChangesimu(){
+             
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/static/output.txt', false);
+                xhr.onreadystatechange = function(){
+                  if (xhr.readyState == 4 && xhr.status == 200){
+                    var response = JSON.parse(xhr.responseText);
+
+                    if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
+                      imuChartUpdate(response);
+                      
+                      lastSeen = response
+                    }
+                  }
+                  else{
+                    console.log("Not Found");
+                  }
+                }
+              
+                xhr.send();
+                  
+                
+              };
+              setInterval(checkForChangesimu,1000)
+              </script>
+<<<<<<< HEAD
+            </canvas> 
+          </div> -->
+        </div>
+        <div id="chartGroup3" class="sensorDataSmall data-container">
           <div id="imu">
             <canvas id="imuChart" height="400px">
               <script>
@@ -346,9 +423,36 @@
               };
               setInterval(checkForChangesimu,1000)
               </script>
+=======
+>>>>>>> 1851d25bf1be167f703242e07cd708a0c158bc32
             </canvas>
           </div>
+          <!-- <div id="humidity">
+            <canvas id="hmdChart" height="400px">
+              <script>
+                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+                new Chart("hmdChart", {
+                  type: "line", 
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      borderColor: "black",
+                      data: [11, 12, 13, 14, 15, 14, 12, 10, 9, 10, 7, 12, 11, 9, 7, 5, 3, 1, 1, 0],
+                      fill: false
+                    }]
+                  },
+                options:{
+                  legend: {display: false},
+                  scales: {yAxes: [{ticks: {min: 0, max: 16}}],
+                }
+              }
+            });
+              </script>
+            </canvas>
+          </div> -->
         </div>
+<<<<<<< HEAD
+=======
         <div id="chartGroup3" class="sensorDataSmall data-container">
           <div id="temperature">
             <canvas id="tmpChart" height="400px">
@@ -397,6 +501,7 @@
             </canvas>
           </div>
         </div>
+>>>>>>> 1851d25bf1be167f703242e07cd708a0c158bc32
       </div>
       
       <div id="joystick-padding"></div>
