@@ -21,6 +21,7 @@ var driveHandler = new function() {
         'controlMode': 'joystick',
         'maxThrottle' : 1,
         'throttleMode' : 'user',
+        'graph' : 'ultrasonic',
         'buttons': {
             "w1": false,  // boolean; true is 'down' or pushed, false is 'up' or not pushed
             "w2": false,
@@ -46,7 +47,8 @@ var driveHandler = new function() {
       driveURL = '/drive'
       socket = new WebSocket('ws://' + location.host + '/wsDrive');
 
-      setBindings()
+      setBindings();
+      updateUI();
 
       joystick_element = document.getElementById('joystick_container');
       joystick_options = {
@@ -120,6 +122,7 @@ var driveHandler = new function() {
             updateUI();
         }
       };
+      updateUI();
 
       $(document).keydown(function(e) {
           if(e.which == 32) { toggleBrake() }  // 'space'  brake
@@ -138,12 +141,20 @@ var driveHandler = new function() {
         updateDriveMode($(this).val());
       });
 
-      $('#max_throttle_select').on('change', function () {
-        state.maxThrottle = parseFloat($(this).val());
+      $('#speedRange').on('change', function () {
+        state.maxThrottle = parseFloat(output.value);
+        console.log(state.maxThrottle);
       });
 
       $('#throttle_mode_select').on('change', function () {
         state.throttleMode = $(this).val();
+      });
+
+      $('#chart-select').on('change', function () {
+        state.graph = $(this).val();
+        console.log(state.graph);
+        updateUI();
+        
       });
 
       $('#record_button').click(function () {
@@ -260,12 +271,12 @@ var driveHandler = new function() {
 
       if (state.recording) {
         $('#record_button')
-          .html('Stop Recording (r)')
+          .html('Stop Recording')
           .removeClass('btn-info')
           .addClass('btn-warning').end()
       } else {
         $('#record_button')
-          .html('Start Recording (r)')
+          .html('Start Recording')
           .removeClass('btn-warning')
           .addClass('btn-info').end()
       }
@@ -315,6 +326,31 @@ var driveHandler = new function() {
         $('#tilt-toggle').removeClass("active");
         $('#tilt').removeAttr("checked")
       }
+      if(state.graph == "halleffect"){
+        $('#tflChart').show();        
+        $('#chartGroup1').show();
+      }
+      else{
+        $('#tflChart').hide();
+        $('#chartGroup1').hide();
+      }
+      if(state.graph == "ultrasonic"){
+        $('#uscChart').show();
+        $('#imuChart').hide();
+        $('#chartGroup2').show();
+
+      }
+      else if(state.graph == "imu"){
+        $('#imuChart').show();
+        $('#uscChart').hide();        
+        $('#chartGroup2').show();
+      }
+      else{
+        $('#imuChart').hide();
+        $('#uscChart').hide();
+        $('#chartGroup2').hide();
+      }
+         
 
       //drawLine(state.tele.user.angle, state.tele.user.throttle)
     };
@@ -725,4 +761,3 @@ function remap( x, oMin, oMax, nMin, nMax ){
 
 return result;
 }
-

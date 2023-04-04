@@ -1,24 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <div class="container">
-    <div class="row">
-
-      <div class="col-md-6">
+  <div class="container" style="width: 1200px;  margin: 0 auto; padding-left: 0px; padding-right: 0px">
+    
+      <div class="leftCol" style="text-align: center; width: 280px; height: 600px; float: left; margin: 10px;">
         <!-- pilot mode/recording -->
         <form>
-            <label>(M)ode</label>
-            <select id="mode_select" class="form-control"  style="display: inline">
-              <option value="user">(U)ser</option>
-              <option value="local">Full (A)uto</option>
-              <option value="local_angle">Auto (S)teer</option>
-            </select>
-            <button type="button" id="record_button" class="btn btn-info" >
-              Start (R)ecording
-            </button>
+          <label>Mode</label>
+          <select id="mode_select" class="form-control"  style="display: inline">
+            <option value="user">User</option>
+            <option value="local">Full Auto</option>
+            <option value="local_angle">Auto Steer</option>
+          </select>
+          <button type="button" id="record_button" class="btn btn-info" >
+            Start Recording
+          </button>
         </form>
+      </br>
 
-        <!-- programmable buttons -->
+
+      <!-- programmable buttons -->
         <form id="button_bar">
           <button type="button" id="w1" class="btn btn-info">1</button>
           <button type="button" id="w2" class="btn btn-info">2</button>
@@ -26,13 +27,73 @@
           <button type="button" id="w4" class="btn btn-info">4</button>
           <button type="button" id="w5" class="btn btn-info">5</button>
         </form>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
+      </br>
 
-        <!-- video -->
-        <div class="thumbnail">
-          <img id='mpeg-image', class='img-responsive' src="/video"/> </img>
+        <div>
+          <label class="group-label" style="display: inline">Throttle:</label>
+          <select id="throttle_mode_select" class="form-control" style="display: inline">
+            <option value="user" selected>Maximum</option>
+            <option value="constant">Constant</option>
+          </select>
+          <form id="speedRange" class="slide-container" style="margin-top: 10px" oninput="output.value = parseInt(slider.value)/100">
+            <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="50" 
+                    class="slider"
+                    id="slider"
+                                      
+            />
+            <output id="output" name="output" for="slider"></output>
+            
+          </form>
         </div>
-
-        <!-- steering/throttle meters -->
+      </br>
+   
+        <div>
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-primary" id="joystick-toggle">
+              <input type="radio" name="controlMode" id="joystick" autocomplete="off" value="joystick"> Joystick
+            </label>
+            <label class="btn btn-primary" id="gamepad-toggle">
+              <input type="radio" name="controlMode" id="gamepad" autocomplete="off" value="gamepad"> Gamepad
+            </label>
+            <label class="btn btn-primary" id="tilt-toggle">
+              <input type="radio" name="controlMode" id="tilt" autocomplete="off" value="tilt">Device Tilt
+            </label>
+          </div>
+          <label class="group-label" style="display: inline">
+            <a data-toggle="modal" class="btn btn-primary btn-xs" data-target="#aboutControlModes">
+              <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+          </label>
+        </div>
+      </div>
+      <div class = "midCol" style="text-align: center; width: 600px; height: 600px; float: left;">
+        <!-- video -->
+        <div class="thumbnail" style="height:400px;">
+          <img id='mpeg-image', class='img-responsive' src="/video" style="height:390px; padding:5px"/> </img>
+        </div>
+        <div id="joystick-column" class="middleCol" style="width: 600px;">
+        <!-- virtual joystick -->
+        <div class="form-inline" style="text-align: center;">
+        
+        <div id="joystick_outer" class="thumbnail" style="height:150px;">
+          <div id="joystick_container" style="height: 140px; padding: 5px;">
+            <p>Click/touch to use joystick.</p>
+          </div>
+        </div>
+       
+        </div>
         <div id="control-bars">
           <div>
             <span class="glyphicon glyphicon-resize-horizontal pull-left"></span>
@@ -60,54 +121,286 @@
             </div>
           </div>
         </div>
-      </div> <!-- end video column -->
-
-      <div id="joystick-column"  class="col-md-6">
-        <div style="text-align:center;color:rgb(255, 27, 65);display:inline-block">Note: physical game controller overrides web control.</div>
-        <!-- virtual joystick -->
-        <div id="joystick_outer" class="thumbnail">
-          <div id="joystick_container">
-            <p>Click/touch to use joystick.</p>
-          </div>
-        </div>
-
-        <div class="form-inline">
-          <div>
-            <div class="btn-group" data-toggle="buttons">
-              <label class="btn btn-primary" id="joystick-toggle">
-                <input type="radio" name="controlMode" id="joystick" autocomplete="off" value="joystick"> Joystick
-              </label>
-              <label class="btn btn-primary" id="gamepad-toggle">
-                <input type="radio" name="controlMode" id="gamepad" autocomplete="off" value="gamepad"> Gamepad
-              </label>
-              <label class="btn btn-primary" id="tilt-toggle">
-                <input type="radio" name="controlMode" id="tilt" autocomplete="off" value="tilt">Device Tilt
-              </label>
-            </div>
-            <label class="group-label" style="display: inline">
-              <a data-toggle="modal" class="btn btn-primary btn-xs" data-target="#aboutControlModes">
-                <span class="glyphicon glyphicon-info-sign"></span>
-              </a>
-            </label>
-          </div>
-
-          <br/>
-          <div>
-            <label class="group-label" style="display: inline">Throttle:</label>
-            <select id="throttle_mode_select" class="form-control" style="display: inline">
-              <option value="user" selected>Maximum</option>
-              <option value="constant">Constant</option>
-            </select>
-            <select id="max_throttle_select" class="form-control" style="display: inline">
-              {% for t in [100, 95, 90, 85, 80, 75, 70, 60, 50, 40, 30, 20, 10] %}
-                <option value="{{ t / 100.0 }}">{{ t }}%</option>
-              {% end %}
-            </select>
-          </div>
-        </div>
       </div> <!-- end joystick-column -->
+      </div>
+      
+      <div class="rightCol" style="text-align: center; width: 280px; height: 600px; float: left;">
+        <div id="battery">
+          <h1 id="battery-header" style="font-size: 25px;">Battery Percentage</h1>
+          <canvas id="batChart" height="100px"></canvas>
+        </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <select id="chart-select" class="form-control" style="display: inline">
+          <option value="ultrasonic">Ultrasonic</option>
+          <option value="tfluna">TF Luna</option>
+          <option value="imu">IMU</option>
+        </select>
+        
+        <div id="chartGroup1" class="sensorDataSmall data-container" >
+          <div id="tfluna">
+            <canvas id="tflChart" height="400px">
+              <script>
+                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+                var tflChart = new Chart("tflChart", {
+                  type: "line", 
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      borderColor: "red",
+                      data: [],
+                      fill: false
+                    }]
+                  },
+                options:{
+                  legend: {display: false},
+                  scales: {yAxes: [{ticks: {min: 0, max: 50}}],
+                }
+              }
+            });
+            function tflUpdate(data){
+              
+              var datasets = tflChart.data.datasets;
+              console.log(datasets[0]);
+              if(datasets[0].data.length === 20){
+                datasets[0].data.shift()
+              }
+              datasets[0].data.push(Number(data[0]));
+              tflChart.datasets = datasets;
+              tflChart.update();
+            }
+            var lastSeen = []
+            function checkForChangesTFLuna(){
+             
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/static/output.txt', false);
+                xhr.onreadystatechange = function(){
+                  if (xhr.readyState == 4 && xhr.status == 200){
+                    var response = JSON.parse(xhr.responseText);
+
+                    if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
+                      tflUpdate(response);
+                      
+                      lastSeen = response
+                    }
+                  }
+                  else{
+                    console.log("Not Found");
+                  }
+                }
+              
+                xhr.send();
+                  
+                
+              };
+              setInterval(checkForChangesTFLuna,1000)
+              </script>
+            </canvas>
+          </div>
+        </div>
+        <div id="chartGroup2" class="sensorDataLarge data-container" >
+          <div id="ultrasonic" data-dataRed="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]" data-dataGreen="[2, 2, 5, 4, 8, 4, 7, 6, 3, 1, 0, 6, 7, 8, 9, 14, 13, 12, 11, 10]" data-dataBlue="[14, 12, 9, 14, 15, 16, 10, 9, 9, 6, 7, 5, 6, 8, 9, 10, 9, 13, 7, 6]" data-dataBlack = "[11, 12, 13, 14, 15, 14, 12, 10, 9, 10, 7, 12, 11, 9, 7, 5, 3, 1, 1, 0]">
+            <canvas id="uscChart" height="400px">
+              <script>
+                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+                var uscChart = new Chart("uscChart", {
+                  type: "line", 
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      borderColor: "red",
+                      data: [],
+                      fill: false
+                    },{
+                      borderColor: "green",
+                      data: [],
+                      fill: false
+                    },{
+                      borderColor: "blue",
+                      data: [],
+                      fill: false
+                    },{
+                      borderColor: "black",
+                      data: [],
+                      fill: false
+                    }]
+                  },
+                options:{
+                  legend: {display: false},
+                  scales: {yAxes: [{ticks: {min: 0, max: 50}}],
+                }
+              }
+            });
+            function ultrasonicUpdate(data){
+              
+              var datasets = uscChart.data.datasets;
+              console.log(datasets[0]);
+              if(datasets[0].data.length === 20){
+                datasets[0].data.shift();
+                datasets[1].data.shift();
+                datasets[2].data.shift();
+                datasets[3].data.shift();
+              }
+              datasets[0].data.push(Number(data[0]));
+              datasets[1].data.push(Number(data[1]));
+              datasets[2].data.push(Number(data[2]));
+              datasets[3].data.push(Number(data[3]));
+              uscChart.datasets = datasets;
+              uscChart.update();
+            }
+            var lastSeen = []
+            function checkForChangesUltra(){
+             
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/static/output.txt', false);
+                xhr.onreadystatechange = function(){
+                  if (xhr.readyState == 4 && xhr.status == 200){
+                    var response = JSON.parse(xhr.responseText);
+
+                    if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
+                      ultrasonicUpdate(response);
+                      
+                      lastSeen = response
+                    }
+                  }
+                  else{
+                    console.log("Not Found");
+                  }
+                }
+              
+                xhr.send();
+                  
+                
+              };
+              setInterval(checkForChangesUltra,1000)
+            
+              </script>
+            </canvas>
+          </div>
+          <div id="imu">
+            <canvas id="imuChart" height="400px">
+              <script>
+                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+                var imuChart = new Chart("imuChart", {
+                  type: "line", 
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      borderColor: "black",
+                      data: [],
+                      fill: false
+                    },
+                    {
+                      borderColor: "red",
+                      data: [],
+                      fill: false
+                    },
+                    {
+                      borderColor: "black",
+                      data: [],
+                      fill: false
+                    }]
+                  },
+                options:{
+                  legend: {display: false},
+                  scales: {yAxes: [{ticks: {min: 0, max: 50}}],
+                }
+              }
+            });
+            function imuChartUpdate(data){
+              
+              var datasets = imuChart.data.datasets;
+              console.log(datasets[0]);
+              if(datasets[0].data.length === 20){
+                datasets[0].data.shift();
+              }
+              datasets[0].data.push(Number(data[0]));
+              imuChart.datasets = datasets;
+              imuChart.update();
+            }
+            var lastSeen = []
+            function checkForChangesimu(){
+             
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/static/output.txt', false);
+                xhr.onreadystatechange = function(){
+                  if (xhr.readyState == 4 && xhr.status == 200){
+                    var response = JSON.parse(xhr.responseText);
+
+                    if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
+                      imuChartUpdate(response);
+                      
+                      lastSeen = response
+                    }
+                  }
+                  else{
+                    console.log("Not Found");
+                  }
+                }
+              
+                xhr.send();
+                  
+                
+              };
+              setInterval(checkForChangesimu,1000)
+              </script>
+            </canvas>
+          </div>
+        </div>
+        <div id="chartGroup3" class="sensorDataSmall data-container">
+          <div id="temperature">
+            <canvas id="tmpChart" height="400px">
+              <script>
+                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+                new Chart("tmpChart", {
+                  type: "line", 
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      borderColor: "green",
+                      data: [2, 2, 5, 4, 8, 4, 7, 6, 3, 1, 0, 6, 7, 8, 9, 14, 13, 12, 11, 10],
+                      fill: false
+                    }]
+                  },
+                options:{
+                  legend: {display: false},
+                  scales: {yAxes: [{ticks: {min: 0, max: 16}}],
+                }
+              }
+            });
+              </script>
+            </canvas>
+          </div>
+          <div id="humidity">
+            <canvas id="hmdChart" height="400px">
+              <script>
+                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+                new Chart("hmdChart", {
+                  type: "line", 
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      borderColor: "black",
+                      data: [11, 12, 13, 14, 15, 14, 12, 10, 9, 10, 7, 12, 11, 9, 7, 5, 3, 1, 1, 0],
+                      fill: false
+                    }]
+                  },
+                options:{
+                  legend: {display: false},
+                  scales: {yAxes: [{ticks: {min: 0, max: 16}}],
+                }
+              }
+            });
+              </script>
+            </canvas>
+          </div>
+        </div>
+      </div>
+      
       <div id="joystick-padding"></div>
-    </div> <!-- END row -->
+     <!-- END row -->
   </div> <!-- END page Container -->
 
   <footer class="footer" id="vehicle_footer">
