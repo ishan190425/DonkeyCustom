@@ -17,7 +17,7 @@ import donkeycar
 import os
 import PIL
 import pickle
-import RPi.GPIO as GPIO
+
 logger = logging.getLogger(__name__)
 
 
@@ -93,9 +93,7 @@ class Vehicle:
         self.profiler = PartProfiler()
         self.cfg = donkeycar.load_config()
         self.STOP_SIGN_DETECTOR = self.cfg.STOP_SIGN_DETECTOR
-        self.pin = 17
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.pin,GPIO.IN)
+        
 
     def add(self, part, inputs=[], outputs=[],
             threaded=False, run_condition=None):
@@ -222,25 +220,20 @@ class Vehicle:
                 p = entry['part']
                 # start timing part run
                 self.profiler.on_part_start(p)
-                if (self.STOP_SIGN_DETECTOR and type(p)== donkeycar.parts.object_detector.stop_sign_detector_Tensorflow.StopSignDetector):
-                    if GPIO.input(self.pin):
-                        print("Found Stop Sign")
-                        self.mem.put(entry['outputs'], [0,0])
+                # get inputs from memory
+                inputs = self.mem.get(entry['inputs'])
+                # run the part
+                if entry.get('thread'):
+                    outputs = p.run_threaded(*inputs)
                 else:
-                    # get inputs from memory
-                    inputs = self.mem.get(entry['inputs'])
-                    # run the part
-                    if entry.get('thread'):
-                        outputs = p.run_threaded(*inputs)
-                    else:
-                        outputs = p.run(*inputs)
+                    outputs = p.run(*inputs)
 
-                    # save the output to memory
-                    if outputs is not None:
-                        self.mem.put(entry['outputs'], outputs)
-                    if type(p) == donkeycar.parts.camera.Webcam:
-                        img = p.get_old_image()
-                        self.mem.add_old_image(img)
+                # save the output to memory
+                if outputs is not None:
+                    self.mem.put(entry['outputs'], outputs)
+                if type(p) == donkeycar.parts.camera.Webcam:
+                    img = p.get_old_image()
+                    self.mem.add_old_image(img)
                     # finish timing part run
                 self.profiler.on_part_finished(p)
                 if type(p) == donkeycar.parts.camera.Webcam:
