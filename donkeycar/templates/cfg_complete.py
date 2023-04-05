@@ -612,6 +612,7 @@ REALSENSE_D435_ID = None        # serial number of camera or None if you only ha
 
 # Stop Sign Detector
 STOP_SIGN_DETECTOR = False
+STOP_SIGN_DETECTOR_ACCELERATOR = False
 
 # FPS counter
 SHOW_FPS = False

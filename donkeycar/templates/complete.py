@@ -439,13 +439,14 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None,
                 inputs=['pilot/throttle'],
                 outputs=['pilot/throttle'])
         else:
+            from donkeycar.parts.object_detector.stop_sign_detector_Tensorflow \
+                import StopSignDetector
             V.add(StopSignDetector(),
-                inputs=['cam/image_array', 'pilot/throttle'],
-                outputs=['pilot/throttle', 'cam/image_array'])
-            
-            V.add(ThrottleFilter(), 
-                inputs=['pilot/throttle'],
-                outputs=['pilot/throttle'])
+                  inputs=[],
+                  outputs=['pilot/throttle'])
+            V.add(ThrottleFilter(),
+                  inputs=['pilot/throttle'],
+                  outputs=['pilot/throttle'])
 
     #
     # to give the car a boost when starting ai mode in a race.
