@@ -616,3 +616,6 @@ STOP_SIGN_DETECTOR = False
 # FPS counter
 SHOW_FPS = False
 FPS_DEBUG_INTERVAL = 10    # the interval in seconds for printing the frequency info into the shell
+
+#SENSORS
+SENSORS = False
