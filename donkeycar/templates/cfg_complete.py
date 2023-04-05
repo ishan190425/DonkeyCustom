@@ -35,7 +35,7 @@ CAMERA_HFLIP = False
 CAMERA_INDEX = 0  # used for 'WEBCAM' and 'CVCAM' when there is more than one camera connected 
 # For CSIC camera - If the camera is mounted in a rotated position, changing the below parameter will correct the output frame orientation
 CSIC_CAM_GSTREAMER_FLIP_PARM = 0 # (0 => none , 4 => Flip horizontally, 6 => Flip vertically)
-
+PRE_PROCESSING = False
 # For IMAGE_LIST camera
 # PATH_MASK = "~/mycar/data/tub_1_20-03-12/*.jpg"
 
@@ -612,10 +612,6 @@ REALSENSE_D435_ID = None        # serial number of camera or None if you only ha
 
 # Stop Sign Detector
 STOP_SIGN_DETECTOR = False
-STOP_SIGN_MIN_SCORE = 0.2
-STOP_SIGN_SHOW_BOUNDING_BOX = True
-STOP_SIGN_MAX_REVERSE_COUNT = 10    # How many times should the car reverse when detected a stop sign, set to 0 to disable reversing
-STOP_SIGN_REVERSE_THROTTLE = -0.5     # Throttle during reversing when detected a stop sign
 
 # FPS counter
 SHOW_FPS = False
