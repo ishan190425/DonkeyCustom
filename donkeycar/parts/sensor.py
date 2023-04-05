@@ -24,7 +24,7 @@ class Sensor():
                     i+=1
                 except:
                     continue
-            print(serialData)
+            #print(serialData)
             #print(os.getcwd())
             with open("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/output.txt", "w+", encoding = "utf-8") as file:
                 file.write(str(serialData))
