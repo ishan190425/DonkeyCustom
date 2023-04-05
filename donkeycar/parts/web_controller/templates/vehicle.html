@@ -153,7 +153,7 @@
                   },
                 options:{
                   legend: {display: false},
-                  scales: {yAxes: [{ticks: {min: 0, max: 50}}],
+                  scales: {yAxes: [{ticks: {min: 0, max: 200}}],
                 }
               }
             });
@@ -164,7 +164,7 @@
               if(datasets[0].data.length === 20){
                 datasets[0].data.shift()
               }
-              datasets[0].data.push(Number(data[0]));
+              datasets[0].data.push(Number(data[7]));
               tflChart.datasets = datasets;
               tflChart.update();
             }
@@ -177,12 +177,13 @@
                 xhr.onreadystatechange = function(){
                   if (xhr.readyState == 4 && xhr.status == 200){
                     var response = JSON.parse(xhr.responseText);
-
-                    if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
-                      tflUpdate(response);
+	            //console.log(response);
+		    tflUpdate(response);
+                    //if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
+                      //tflUpdate(response);
                       
-                      lastSeen = response
-                    }
+                      //lastSeen = response
+                    //}
                   }
                   else{
                     console.log("Not Found");
@@ -227,7 +228,7 @@
                   },
                 options:{
                   legend: {display: false},
-                  scales: {yAxes: [{ticks: {min: 0, max: 50}}],
+                  scales: {yAxes: [{ticks: {min: 0, max: 200}}],
                 }
               }
             });
@@ -257,12 +258,14 @@
                 xhr.onreadystatechange = function(){
                   if (xhr.readyState == 4 && xhr.status == 200){
                     var response = JSON.parse(xhr.responseText);
-
-                    if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
-                      ultrasonicUpdate(response);
+		    ultrasonicUpdate(response);
+		    //console.log("IN HERE");
+		    //console.log(response);
+                    //if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
+                      //ultrasonicUpdate(response);
                       
-                      lastSeen = response
-                    }
+                      //lastSeen = response
+                    //}
                   }
                   else{
                     console.log("Not Found");
@@ -314,8 +317,14 @@
               console.log(datasets[0]);
               if(datasets[0].data.length === 20){
                 datasets[0].data.shift();
+                datasets[1].data.shift();
+                datasets[2].data.shift();
+                
               }
-              datasets[0].data.push(Number(data[0]));
+              datasets[0].data.push(Number(data[4]));
+              datasets[1].data.push(Number(data[5]));
+              datasets[2].data.push(Number(data[6]));
+              
               imuChart.datasets = datasets;
               imuChart.update();
             }
@@ -328,12 +337,12 @@
                 xhr.onreadystatechange = function(){
                   if (xhr.readyState == 4 && xhr.status == 200){
                     var response = JSON.parse(xhr.responseText);
-
-                    if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
-                      imuChartUpdate(response);
+		    imuChartUpdate(response);
+                    //if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
+                      //imuChartUpdate(response);
                       
-                      lastSeen = response
-                    }
+                      //lastSeen = response
+                    //}
                   }
                   else{
                     console.log("Not Found");
@@ -376,7 +385,7 @@
                   },
                 options:{
                   legend: {display: false},
-                  scales: {yAxes: [{ticks: {min: 0, max: 50}}],
+                  scales: {yAxes: [{ticks: {min: 0, max: 200}}],
                 }
               }
             });
@@ -386,8 +395,14 @@
               console.log(datasets[0]);
               if(datasets[0].data.length === 20){
                 datasets[0].data.shift();
+                datasets[1].data.shift();
+                datasets[2].data.shift();
+                
               }
-              datasets[0].data.push(Number(data[0]));
+              datasets[0].data.push(Number(data[4]));
+              datasets[1].data.push(Number(data[5]));
+              datasets[2].data.push(Number(data[6]));
+              
               imuChart.datasets = datasets;
               imuChart.update();
             }

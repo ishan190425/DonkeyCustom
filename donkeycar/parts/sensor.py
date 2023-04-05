@@ -2,6 +2,7 @@ import serial
 import time
 import requests
 import subprocess
+import os
 
 class Sensor():
     def __init__(self) -> None:
@@ -24,9 +25,10 @@ class Sensor():
                 except:
                     continue
             print(serialData)
-            with open("donkeycar/parts/web_controller/templates/output.txt", "w+", encoding = "utf-8") as file:
+            #print(os.getcwd())
+            with open("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/output.txt", "w+", encoding = "utf-8") as file:
                 file.write(str(serialData))
-    def run(self,inputs):
+    def run(self):
         self.checkUpdate()
         
 
