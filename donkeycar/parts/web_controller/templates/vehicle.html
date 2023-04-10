@@ -160,11 +160,11 @@
             function tflUpdate(data){
               
               var datasets = tflChart.data.datasets;
-              console.log(datasets[0]);
+              //console.log(datasets[0]);
               if(datasets[0].data.length === 20){
                 datasets[0].data.shift()
               }
-              datasets[0].data.push(Number(data[7]));
+              datasets[0].data.push(Number(data[10]));
               tflChart.datasets = datasets;
               tflChart.update();
             }
@@ -235,7 +235,7 @@
             function ultrasonicUpdate(data){
               
               var datasets = uscChart.data.datasets;
-              console.log(datasets[0]);
+              //console.log(datasets[0]);
               if(datasets[0].data.length === 20){
                 datasets[0].data.shift();
                 datasets[1].data.shift();
@@ -360,15 +360,15 @@
         </div>
         <div id="chartGroup3" class="sensorDataSmall data-container">
           <div id="imu">
-            <canvas id="imuChart" height="400px">
+            <canvas id="imuChart1" height="400px">
               <script>
                 var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
-                var imuChart = new Chart("imuChart", {
+                var imuChart1 = new Chart("imuChart1", {
                   type: "line", 
                   data: {
                     labels: xValues,
                     datasets: [{
-                      borderColor: "black",
+                      borderColor: "blue",
                       data: [],
                       fill: false
                     },
@@ -385,26 +385,104 @@
                   },
                 options:{
                   legend: {display: false},
-                  scales: {yAxes: [{ticks: {min: 0, max: 200}}],
+                  scales: {yAxes: [{ticks: {min: -20, max: 20}}],
                 }
               }
             });
-            function imuChartUpdate(data){
-              
-              var datasets = imuChart.data.datasets;
-              console.log(datasets[0]);
-              if(datasets[0].data.length === 20){
-                datasets[0].data.shift();
-                datasets[1].data.shift();
-                datasets[2].data.shift();
+          
+            function imuChartUpdate1(data){
+              console.log("start");
+              var datasets1 = imuChart1.data.datasets;
+              //console.log(datasets1[0]);
+              //console.log(data);
+              //console.log("-------")
+              if(datasets1[0].data.length === 20){
+                datasets1[0].data.shift();
+                datasets1[1].data.shift();
+                datasets1[2].data.shift();
                 
               }
-              datasets[0].data.push(Number(data[4]));
-              datasets[1].data.push(Number(data[5]));
-              datasets[2].data.push(Number(data[6]));
+              datasets1[0].data.push(Number(data[4]));
+              datasets1[1].data.push(Number(data[5]));
+              datasets1[2].data.push(Number(data[6]));
               
-              imuChart.datasets = datasets;
-              imuChart.update();
+              imuChart1.datasets = datasets1;
+              imuChart1.update();
+            }
+            var lastSeen = []
+            function checkForChangesimu(){
+             
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/static/output.txt', false);
+                //console.log("before function");
+                xhr.onreadystatechange = function(){
+                  //console.log("In the function");
+                  if (xhr.readyState == 4 && xhr.status == 200){
+                    var response = JSON.parse(xhr.responseText);
+		    console.log("before function");
+                    imuChartUpdate1(response);
+        
+                  }
+                  else{
+                    console.log("Not Found");
+                  }
+                }
+              
+                xhr.send();
+                  
+                
+              };
+              setInterval(checkForChangesimu,1000)
+              </script>
+            </canvas>
+            <canvas id="imuChart2" height="400px">
+              <script>
+                var xValues = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+                var imuChart2 = new Chart("imuChart2", {
+                  type: "line", 
+                  data: {
+                    labels: xValues,
+                    datasets: [{
+                      borderColor: "blue",
+                      data: [],
+                      fill: false
+                    },
+                    {
+                      borderColor: "red",
+                      data: [],
+                      fill: false
+                    },
+                    {
+                      borderColor: "black",
+                      data: [],
+                      fill: false
+                    }]
+                  },
+                options:{
+                  legend: {display: false},
+                  scales: {yAxes: [{ticks: {min: -180, max: 180}}],
+                }
+              }
+            });
+          
+            function imuChartUpdate2(data){
+              
+              var datasets2 = imuChart2.data.datasets;
+              //console.log(datasets2[0]);
+              console.log("second");
+              if(datasets2[0].data.length === 20){
+                datasets2[0].data.shift();
+                datasets2[1].data.shift();
+                datasets2[2].data.shift();
+                
+              }
+              datasets2[0].data.push(Number(data[7]));
+              datasets2[1].data.push(Number(data[8]));
+              datasets2[2].data.push(Number(data[9]));
+              
+              imuChart2.datasets = datasets2;
+              imuChart2.update();
             }
             var lastSeen = []
             function checkForChangesimu(){
@@ -415,12 +493,12 @@
                 xhr.onreadystatechange = function(){
                   if (xhr.readyState == 4 && xhr.status == 200){
                     var response = JSON.parse(xhr.responseText);
-
-                    if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
-                      imuChartUpdate(response);
+                    imuChartUpdate2(response);
+                    // if (!(lastSeen.length == response.length && lastSeen.every(function(value,index) { return value === response[index]}))){
+                    //   imuChartUpdate(response);
                       
-                      lastSeen = response
-                    }
+                    //   lastSeen = response
+                    // }
                   }
                   else{
                     console.log("Not Found");
