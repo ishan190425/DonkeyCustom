@@ -8,10 +8,6 @@ class Sensor():
     def __init__(self) -> None:
         self.ser = serial.Serial("/dev/ttyACM0", 9600,timeout=1)
         self.ser.reset_input_buffer()
-        if os.path.exists("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/final.txt"):
-            os.remove("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/final.txt")
-        if os.path.exists("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/output.txt"):
-            os.remove("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/output.txt")
         with open("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/final.txt", "w+", encoding = "utf-8") as file:
                 file.write("[Ultra1, Ultra2, Ultra3, Ultra4, ACx, ACy, ACz, GyroX, GyroY, GyroZ, TFLuna Distance]\n")
     def checkUpdate(self):

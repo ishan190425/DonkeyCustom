@@ -314,7 +314,7 @@
             function imuChartUpdate(data){
               
               var datasets = imuChart.data.datasets;
-              console.log(datasets[0]);
+              //console.log(datasets[0]);
               if(datasets[0].data.length === 20){
                 datasets[0].data.shift();
                 datasets[1].data.shift();
@@ -391,7 +391,7 @@
             });
           
             function imuChartUpdate1(data){
-              console.log("start");
+              //console.log("start");
               var datasets1 = imuChart1.data.datasets;
               //console.log(datasets1[0]);
               //console.log(data);
@@ -420,7 +420,7 @@
                   //console.log("In the function");
                   if (xhr.readyState == 4 && xhr.status == 200){
                     var response = JSON.parse(xhr.responseText);
-		    console.log("before function");
+		    //console.log("before function");
                     imuChartUpdate1(response);
         
                   }

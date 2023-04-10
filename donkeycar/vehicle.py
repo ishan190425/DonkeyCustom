@@ -83,7 +83,7 @@ class PartProfiler:
 
 class Vehicle:
     def __init__(self, mem=None):
-
+        
         if not mem:
             mem = Memory()
         self.mem = mem
@@ -93,6 +93,10 @@ class Vehicle:
         self.profiler = PartProfiler()
         self.cfg = donkeycar.load_config()
         self.STOP_SIGN_DETECTOR = self.cfg.STOP_SIGN_DETECTOR
+        if os.path.exists("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/final.txt"):
+            os.remove("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/final.txt")
+        if os.path.exists("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/output.txt"):
+            os.remove("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/output.txt")
         
 
     def add(self, part, inputs=[], outputs=[],
