@@ -329,26 +329,30 @@ var driveHandler = new function() {
       if(state.graph == "tfluna"){
         $('#tflChart').show();   
         $('#uscChart').hide();
-        $('#imuChart').hide();
+        $('#imuChart1').hide();
+        $('#imuChart2').hide();
         $('#chartGroup1').show();
       }
       else if(state.graph == "ultrasonic"){
         $('#uscChart').show();
-        $('#imuChart').hide();
+        $('#imuChart1').hide();
+        $('#imuChart2').hide();
         $('#tflChart').hide(); 
         $('#chartGroup2').show();
 
       }
       else if(state.graph == "imu"){
-        $('#imuChart').show();
+        $('#imuChart1').show();
+        $('#imuChart2').show();
         $('#uscChart').hide();     
         $('#tflChart').hide();    
         $('#chartGroup3').show();
       }
       else{
-        $('#imuChart').hide();
+        $('#imuChart1').hide();
+        $('#imuChart2').hide();
         $('#uscChart').hide();
-        $('#tflChart').hide(); 
+        $('#tflChart').hide();
         
       }
          

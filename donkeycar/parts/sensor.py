@@ -8,28 +8,30 @@ class Sensor():
     def __init__(self) -> None:
         self.ser = serial.Serial("/dev/ttyACM0", 9600,timeout=1)
         self.ser.reset_input_buffer()
+        if os.path.exists("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/final.txt"):
+            os.remove("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/final.txt")
+        if os.path.exists("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/output.txt"):
+            os.remove("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/output.txt")
+        with open("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/final.txt", "w+", encoding = "utf-8") as file:
+                file.write("[Ultra1, Ultra2, Ultra3, Ultra4, ACx, ACy, ACz, GyroX, GyroY, GyroZ, TFLuna Distance]\n")
     def checkUpdate(self):
         if self.ser.in_waiting > 0:
             serialData = self.ser.readline().decode('utf-8').rstrip()
             serialData = serialData.split()
-            i =0
+            data = []
+            final =  []
             for s in serialData:
                 try:
-                    if(i < 4):
-                        serialData[i] = int(s[3:])
-                    else:
-                        if(s[0].isalpha() and i>=4):
-                            serialData.remove(s)
-                            serialData[i] = int(serialData[i])
-                    i+=1
+                    label,number = s.split(":")
+                    data.append(float(number))
+                    full = f"{label}:{number}"
+                    final.append(full)
                 except:
                     continue
-            #print(serialData)
-            #print(os.getcwd())
             with open("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/output.txt", "w+", encoding = "utf-8") as file:
-                file.write(str(serialData))
+                file.write(str(data))
+            with open("/home/pi/projects/donkeycar/donkeycar/parts/web_controller/templates/static/final.txt", "a+", encoding = "utf-8") as file:
+                file.write(str(final) + "\n")
     def run(self):
         self.checkUpdate()
         
-
-    
