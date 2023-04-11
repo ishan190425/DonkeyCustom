@@ -2,14 +2,13 @@
 
 sudo apt-get install -y pv 
 # Step 2: Download and Install Python 3.7
-cd /tmp
-wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tar.xz | pv -t
-tar xf Python-3.7.0.tar.xz | pv -t
+sudo apt-get install -y build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev libffi-dev | pv -t
+wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz
+sudo -y tar zxf Python-3.7.0.tgz
 cd Python-3.7.0
-./configure --enable-optimizations | pv -t
-make -j4 | pv -t
-sudo make altinstall | pv -t
-
+sudo ./configure
+sudo make -j 4
+sudo make altinstall
 cd ..
 sudo rm -rf Python-3.7.0.tar.xz Python-3.7.0
 
@@ -17,6 +16,10 @@ sudo rm -rf Python-3.7.0.tar.xz Python-3.7.0
 echo "Switching to Python 3.7..."
 alias python=python3.7
 alias pip=pip3.7
+alias python3=python3.7
+echo "alias python=python3.7" >> ./bashrc
+echo "alias pip=pip3.7" >> ./bashrc
+echo "alias python3=python3.7" >> ./bashrc
 
 # Step 3: Install Virtualenv
 echo "Installing virtualenv..."
