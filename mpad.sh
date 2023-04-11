@@ -15,15 +15,19 @@ sudo rm -rf Python-3.7.0.tar.xz Python-3.7.0
 # Step 2: Switch to Python 3.7
 echo "Switching to Python 3.7..."
 alias python=python3.7
+alias python3=python3.7
 alias pip=pip3.7
+alias pip3=pip3.7
 alias python3=python3.7
 echo "alias python=python3.7" >> ./bashrc
 echo "alias pip=pip3.7" >> ./bashrc
 echo "alias python3=python3.7" >> ./bashrc
 
+pip install --upgrade pip
+
 # Step 3: Install Virtualenv
 echo "Installing virtualenv..."
-pip install virtualenv | pv -t
+pip3.7 install virtualenv | pv -t
 
 # Step 4: Create Virtual Environment
 echo "Creating virtual environment..."
@@ -31,17 +35,10 @@ python3.7 -m virtualenv env | pv -t
 echo "source ~/env/bin/activate" >> ~/.bashrc
 source ~/.bashrc
 
-# Step 5: Install Requirements
-echo "Installing requirements..."
-pip install -r requirements.txt | pv -t
-
 # Step 6: Update and Upgrade
 echo "Updating and upgrading packages..."
 sudo apt-get update --allow-releaseinfo-change | pv -t
 sudo apt-get -y upgrade | pv -t
-
-# Step 7: Raspi-config
-echo "Please follow the instructions in Step 7 to update the Raspberry Pi settings manually."
 
 # Step 8: Install Dependencies
 echo "Installing dependencies..."
