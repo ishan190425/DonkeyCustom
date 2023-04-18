@@ -17,7 +17,7 @@ class StopSignDetector(object):
     def detect_stop_sign (self):
         if GPIO.input(self.pin):
                 print("Found Stop Sign")
-                return [0,0]
+                return 0
         return 
     
     def run(self):
