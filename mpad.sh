@@ -1,39 +1,19 @@
 #!/bin/bash
 
-sudo apt-get install -y pv 
-# Step 2: Download and Install Python 3.7
-sudo apt-get install -y build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev libffi-dev | pv -t
-wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz
-sudo -y tar zxf Python-3.7.0.tgz
-cd Python-3.7.0
-sudo ./configure
-sudo make -j 4
-sudo make altinstall
-cd ..
-sudo rm -rf Python-3.7.0.tar.xz Python-3.7.0
-
-# Step 2: Switch to Python 3.7
-echo "Switching to Python 3.7..."
-alias python=python3.7
-alias pip=pip3.7
-alias python3=python3.7
-echo "alias python=python3.7" >> ./bashrc
-echo "alias pip=pip3.7" >> ./bashrc
-echo "alias python3=python3.7" >> ./bashrc
 
 # Step 3: Install Virtualenv
 echo "Installing virtualenv..."
-pip install virtualenv | pv -t
+pip3 install virtualenv | pv -t
 
 # Step 4: Create Virtual Environment
 echo "Creating virtual environment..."
-python3.7 -m virtualenv env | pv -t
+python3 -m virtualenv env | pv -t
 echo "source ~/env/bin/activate" >> ~/.bashrc
 source ~/.bashrc
 
 # Step 5: Install Requirements
 echo "Installing requirements..."
-pip install -r requirements.txt | pv -t
+pip3 install -r requirements.txt | pv -t
 
 # Step 6: Update and Upgrade
 echo "Updating and upgrading packages..."
@@ -64,12 +44,14 @@ cd projects
 git clone https://github.com/ishan190425/DonkeyCustom
 cd DonkeyCustom
 git checkout main
-pip install -e .[pi] | pv -t
-pip install -r mpad.txt | pv -t
-pip install https://github.com/lhelontra/tensorflow-on-arm/releases/download/v2.2.0/tensorflow-2.2.0-cp37-none-linux_armv7l.whl | pv -t
+pip3 install -e .[pi] | pv -t
+pip3 install -r mpad.txt | pv -t
+pip3 install https://github.com/lhelontra/tensorflow-on-arm/releases/download/v2.2.0/tensorflow-2.2.0-cp37-none-linux_armv7l.whl | pv -t
 
 # Step 12: (Optional) Install OpenCV
 echo "Installing OpenCV..."
 sudo apt install -y python3-opencv | pv -t
 
 echo "Installation complete!"
+
+donkey createcar --path ~/mycar
