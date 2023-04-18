@@ -1,15 +1,20 @@
 #!/bin/bash
 
 
+pip install --upgrade pip
+
 # Step 3: Install Virtualenv
 echo "Installing virtualenv..."
+
 pip3 install virtualenv | pv -t
+
 
 # Step 4: Create Virtual Environment
 echo "Creating virtual environment..."
 python3 -m virtualenv env | pv -t
 echo "source ~/env/bin/activate" >> ~/.bashrc
 source ~/.bashrc
+
 
 # Step 5: Install Requirements
 echo "Installing requirements..."
@@ -19,9 +24,6 @@ pip3 install -r requirements.txt | pv -t
 echo "Updating and upgrading packages..."
 sudo apt-get update --allow-releaseinfo-change | pv -t
 sudo apt-get -y upgrade | pv -t
-
-# Step 7: Raspi-config
-echo "Please follow the instructions in Step 7 to update the Raspberry Pi settings manually."
 
 # Step 8: Install Dependencies
 echo "Installing dependencies..."
